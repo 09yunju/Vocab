@@ -12,15 +12,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    /* Olive grove + ivory palette */
-    --paper:      #faf8f1;   /* near-white ivory, very subtle warmth */
-    --paper-2:    #efece0;   /* light cream for cards (visible against ivory) */
+    /* Olive grove + soft ivory palette */
+    --paper:      #fcfaf6;   /* very subtle ivory, near white */
+    --paper-2:    #f2eee2;   /* light cream for cards (visible against ivory) */
     --paper-soft: #ffffff;   /* pure white for focused inputs */
     --ink:        #3a2114;   /* deep warm brown */
     --ink-soft:   #5e3a26;   /* medium brown */
     --ink-faint:  #a08066;   /* faded brown */
-    --rule:       #d6cdb6;   /* light sand for borders */
-    --rule-soft:  #e7e0cd;   /* lighter sand */
+    --rule:       #e2dac8;   /* light sand for borders */
+    --rule-soft:  #ebe5d6;   /* lighter sand */
     --accent:     #5d7437;   /* olive green, primary accent */
     --accent-2:   #a3a849;   /* light olive */
     --ochre:      #d99d2b;   /* saffron / Andalusian gold */
@@ -28,7 +28,7 @@
     --olive:      #8a8748;   /* muted olive */
     --bad:        #8a3a3a;   /* deep wine, only for wrong/error */
 
-    --shadow: 0 1px 0 rgba(58, 33, 20, 0.04), 0 14px 42px -12px rgba(58, 33, 20, 0.14);
+    --shadow: 0 1px 0 rgba(58, 33, 20, 0.04), 0 14px 42px -12px rgba(58, 33, 20, 0.12);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,10 +43,7 @@
   }
 
   body {
-    background-image:
-      radial-gradient(circle at 12% 22%, rgba(217, 157, 43, 0.05) 0%, transparent 45%),
-      radial-gradient(circle at 88% 78%, rgba(93, 116, 55, 0.05) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(138, 135, 72, 0.03) 0%, transparent 60%);
+    background-image: none;
   }
 
   .app {
@@ -1005,17 +1002,20 @@
   }
   .flip-card-inner {
     position: relative;
-    display: grid;
-    grid-template-areas: "stack";
+    width: 100%;
+    min-height: 280px;
     transform-style: preserve-3d;
     transition: transform 0.55s cubic-bezier(0.4, 0.0, 0.2, 1);
-    min-height: 280px;
   }
   .flip-card.flipped .flip-card-inner {
     transform: rotateY(180deg);
   }
   .flip-card-front, .flip-card-back {
-    grid-area: stack;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: var(--paper-2);
     border: 1px solid var(--rule);
     border-radius: 4px;
@@ -1028,7 +1028,9 @@
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     box-shadow: var(--shadow);
-    position: relative;
+  }
+  .flip-card-front {
+    transform: rotateY(0deg);
   }
   .flip-card-front::before, .flip-card-back::before {
     content: '';
@@ -2325,6 +2327,37 @@
 
     $('#btnPrevStudy').disabled = studyState.idx === 0;
     $('#btnNextStudy').textContent = studyState.idx + 1 >= studyState.cards.length ? '끝내기 ✓' : '다음 →';
+
+    // Match inner height to taller of front/back so absolute-positioned faces fit
+    requestAnimationFrame(() => requestAnimationFrame(adjustFlipHeight));
+  }
+
+  function adjustFlipHeight() {
+    const inner = $('#flipCardInner');
+    const front = $('#flipFront');
+    const back = $('#flipBack');
+    if (!inner || !front || !back) return;
+    const w = inner.offsetWidth;
+    if (w === 0) return;
+
+    function measure(el) {
+      const clone = el.cloneNode(true);
+      clone.style.position = 'absolute';
+      clone.style.left = '-99999px';
+      clone.style.top = '0';
+      clone.style.transform = 'none';
+      clone.style.visibility = 'hidden';
+      clone.style.width = w + 'px';
+      clone.style.height = 'auto';
+      document.body.appendChild(clone);
+      const h = clone.offsetHeight;
+      document.body.removeChild(clone);
+      return h;
+    }
+
+    const fH = measure(front);
+    const bH = measure(back);
+    inner.style.height = Math.max(fH, bH, 280) + 'px';
   }
 
   function flipStudyCard() {
@@ -2793,6 +2826,9 @@
   });
 
   window.addEventListener('focus', () => { if (currentUser) syncPull(); });
+  window.addEventListener('resize', () => {
+    if (studyState && $('#panel-study').classList.contains('active')) adjustFlipHeight();
+  });
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && currentUser) syncPull();
   });
