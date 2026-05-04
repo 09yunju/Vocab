@@ -2565,14 +2565,13 @@
     const input = $('#answerInput');
     if (!input) return;
     const userAns = input.value.trim();
-    if (!userAns) return;
 
     const card = state.quiz.cards[state.quiz.idx];
     const w = card.word;
     const deckLang = getDeckLang(w.deckId);
     const isT2M = card.dir === 't2m';
     const correctAns = isT2M ? w.meaning : w.term;
-    const isCorrect = checkAnswerMatch(userAns, correctAns);
+    const isCorrect = userAns ? checkAnswerMatch(userAns, correctAns) : false;
 
     const a = $('#quizAnswer');
     let feedback;
@@ -2580,8 +2579,13 @@
       feedback = `<span class="quiz-feedback correct">✓ ${escapeHtml(correctAns)}`;
       if (!isT2M) feedback += ` <button class="speak-btn-tiny" data-speak-correct type="button">♪</button>`;
       feedback += `</span>`;
-    } else {
+    } else if (userAns) {
       feedback = `<span class="quiz-feedback wrong"><span class="user-ans">${escapeHtml(userAns)}</span><span class="arrow">→</span><span class="correct-ans">${escapeHtml(correctAns)}</span>`;
+      if (!isT2M) feedback += ` <button class="speak-btn-tiny" data-speak-correct type="button">♪</button>`;
+      feedback += `</span>`;
+    } else {
+      // Empty input — reveal answer only, no user-ans line
+      feedback = `<span class="quiz-feedback wrong">✗ <span class="correct-ans">${escapeHtml(correctAns)}</span>`;
       if (!isT2M) feedback += ` <button class="speak-btn-tiny" data-speak-correct type="button">♪</button>`;
       feedback += `</span>`;
     }
