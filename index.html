@@ -987,6 +987,128 @@
     50% { opacity: 0.3; }
   }
 
+  /* ===== Study (flashcard flip) ===== */
+  .study-progress {
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-faint);
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  .flip-card {
+    perspective: 1500px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .flip-card-inner {
+    position: relative;
+    display: grid;
+    grid-template-areas: "stack";
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0.0, 0.2, 1);
+    min-height: 280px;
+  }
+  .flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-card-front, .flip-card-back {
+    grid-area: stack;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 48px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .flip-card-front::before, .flip-card-back::before {
+    content: '';
+    position: absolute;
+    top: 16px; left: 16px; right: 16px; bottom: 16px;
+    border: 1px solid var(--rule);
+    pointer-events: none;
+    border-radius: 2px;
+  }
+  .flip-card-back {
+    transform: rotateY(180deg);
+  }
+  .flip-side-main {
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-size: 38px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    position: relative;
+    z-index: 1;
+    word-break: keep-all;
+  }
+  .flip-side-meaning {
+    font-size: 30px;
+    color: var(--ink-soft);
+  }
+  .flip-back-examples {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--rule);
+    width: 100%;
+    max-width: 90%;
+    text-align: left;
+    position: relative;
+    z-index: 1;
+  }
+  .flip-back-example {
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .flip-back-example:last-child { margin-bottom: 0; }
+  .flip-back-example-meaning {
+    font-style: normal;
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-top: 2px;
+    padding-left: 12px;
+    border-left: 2px solid var(--paper-2);
+  }
+
+  .study-hint {
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-faint);
+    text-align: center;
+    margin-top: 6px;
+    margin-bottom: 22px;
+  }
+
+  .study-nav {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .study-nav .nav-prev, .study-nav .nav-next {
+    flex: 1;
+  }
+  .study-nav .nav-prev { max-width: 140px; }
+  .study-nav .nav-next {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .study-nav .nav-spacer { flex: 1; }
+  .study-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+
   @media (max-width: 480px) {
     .app { padding: 24px 16px 60px; }
     h1 { font-size: 32px; }
@@ -996,6 +1118,9 @@
     .result-score { font-size: 50px; }
     .modal { padding: 22px; }
     .auth-card h2 { font-size: 36px; }
+    .flip-card-front, .flip-card-back { padding: 36px 20px; }
+    .flip-side-main { font-size: 30px; }
+    .flip-side-meaning { font-size: 24px; }
   }
 </style>
 </head>
@@ -1011,6 +1136,7 @@
   <nav class="tabs">
     <button class="tab active" data-tab="add">추가</button>
     <button class="tab" data-tab="list">목록 <span class="count" id="countList">0</span></button>
+    <button class="tab" data-tab="study">공부</button>
     <button class="tab" data-tab="quiz">시험</button>
   </nav>
 
@@ -1047,6 +1173,47 @@
       <input type="text" id="search" placeholder="검색..." autocomplete="off">
     </div>
     <ul class="word-list" id="wordList"></ul>
+  </section>
+
+  <!-- STUDY (flashcards) -->
+  <section class="panel" id="panel-study">
+    <div id="studySetup" class="quiz-setup">
+      <h3>공부 설정</h3>
+      <div class="field">
+        <label>단어장 <span style="font-style:normal;font-size:11px;color:var(--ink-faint);">(여러 개 선택 가능)</span></label>
+        <div class="opt-row" id="studyDeckOpts"></div>
+      </div>
+      <div class="field">
+        <label>방향</label>
+        <div class="opt-row" id="studyDirOpts">
+          <button class="opt active" data-dir="t2m">단어 → 뜻</button>
+          <button class="opt" data-dir="m2t">뜻 → 단어</button>
+          <button class="opt" data-dir="mix">섞기</button>
+        </div>
+      </div>
+      <button class="btn" id="btnStartStudy">시작</button>
+    </div>
+
+    <div id="studyView" style="display:none;">
+      <div class="study-progress" id="studyProgress"></div>
+      <div class="flip-card" id="flipCard">
+        <div class="flip-card-inner" id="flipCardInner">
+          <div class="flip-card-front" id="flipFront"></div>
+          <div class="flip-card-back" id="flipBack"></div>
+        </div>
+      </div>
+      <div class="study-hint">탭하면 뒤집기 · 스페이스/← →</div>
+      <div class="study-nav">
+        <button class="btn btn-ghost nav-prev" id="btnPrevStudy">← 이전</button>
+        <button class="btn nav-next" id="btnNextStudy">다음 →</button>
+      </div>
+    </div>
+
+    <div id="studyDone" class="result" style="display:none;">
+      <div class="result-ornament">· · ·</div>
+      <div class="result-label" style="margin-bottom:24px;">¡Bien hecho! 다 봤어</div>
+      <button class="btn" id="btnStudyRestart">다시</button>
+    </div>
   </section>
 
   <!-- QUIZ -->
@@ -1429,7 +1596,7 @@
 
   async function syncPull() {
     if (!currentUser || isSyncing) return;
-    if (state.quiz) return;
+    if (state.quiz || studyState) return;
     if (!navigator.onLine) { setSyncStatus('offline'); return; }
     isSyncing = true;
     setSyncStatus('syncing');
@@ -1509,6 +1676,7 @@
     renderDeckBar();
     updateMeta();
     if ($('#panel-list').classList.contains('active')) renderList();
+    if ($('#panel-study').classList.contains('active')) resetStudyView();
     if ($('#panel-quiz').classList.contains('active')) resetQuizView();
   }
 
@@ -1570,6 +1738,7 @@
     $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
     $$('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
     if (name === 'list') renderList();
+    if (name === 'study') resetStudyView();
     if (name === 'quiz') resetQuizView();
   }
   $$('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
@@ -2012,6 +2181,199 @@
     }
     return cards;
   }
+
+  // ===== Study (flashcards) =====
+  let studyState = null;
+  let studyDir = 't2m';
+  let studySelectedDecks = new Set();
+
+  $$('#studyDirOpts .opt').forEach(o => {
+    o.addEventListener('click', () => {
+      $$('#studyDirOpts .opt').forEach(x => x.classList.remove('active'));
+      o.classList.add('active');
+      studyDir = o.dataset.dir;
+    });
+  });
+
+  function renderStudyDeckSelector() {
+    const container = $('#studyDeckOpts');
+    container.innerHTML = state.decks.map(d => {
+      const n = wordsInDeck(d.id).length;
+      const sel = studySelectedDecks.has(d.id);
+      return `<button class="opt ${sel ? 'active' : ''}" data-deck-study="${d.id}">
+        ${escapeHtml(d.name)}<span class="quiz-deck-count">${n}</span>
+      </button>`;
+    }).join('');
+    container.querySelectorAll('[data-deck-study]').forEach(b => {
+      b.addEventListener('click', () => {
+        const id = b.dataset.deckStudy;
+        if (studySelectedDecks.has(id)) {
+          if (studySelectedDecks.size > 1) studySelectedDecks.delete(id);
+        } else {
+          studySelectedDecks.add(id);
+        }
+        renderStudyDeckSelector();
+      });
+    });
+  }
+
+  function resetStudyView() {
+    $('#studySetup').style.display = 'block';
+    $('#studyView').style.display = 'none';
+    $('#studyDone').style.display = 'none';
+    studyState = null;
+
+    const validIds = new Set(state.decks.map(d => d.id));
+    studySelectedDecks = new Set([...studySelectedDecks].filter(id => validIds.has(id)));
+    if (studySelectedDecks.size === 0) studySelectedDecks.add(state.currentDeckId);
+    renderStudyDeckSelector();
+  }
+
+  function startStudy() {
+    if (studySelectedDecks.size === 0) { toast('단어장을 하나 이상 선택해줘'); return; }
+    const pool = state.words.filter(w => studySelectedDecks.has(w.deckId));
+    if (pool.length === 0) { toast('선택한 단어장에 단어가 없어'); return; }
+
+    const cards = pool.slice();
+    cards.sort(() => Math.random() - 0.5);
+    // Resolve direction per card if mix
+    cards.forEach(c => {
+      c._studyDir = studyDir === 'mix' ? (Math.random() < 0.5 ? 't2m' : 'm2t') : studyDir;
+    });
+
+    studyState = { cards, idx: 0, flipped: false };
+
+    $('#studySetup').style.display = 'none';
+    $('#studyView').style.display = 'block';
+    $('#studyDone').style.display = 'none';
+    showStudyCard();
+  }
+
+  function showStudyCard() {
+    if (!studyState) return;
+    const card = studyState.cards[studyState.idx];
+
+    // Reset flipped (instant, no animation between cards)
+    const inner = $('#flipCardInner');
+    inner.style.transition = 'none';
+    $('#flipCard').classList.remove('flipped');
+    studyState.flipped = false;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { inner.style.transition = ''; });
+    });
+
+    $('#studyProgress').textContent = `${studyState.idx + 1} / ${studyState.cards.length}`;
+
+    const dir = card._studyDir || 't2m';
+    const deckLang = getDeckLang(card.deckId);
+
+    const front = $('#flipFront');
+    const back = $('#flipBack');
+
+    // Helpers
+    function buildExamplesHtml(card) {
+      if (!card.examples || card.examples.length === 0) return '';
+      let html = '<div class="flip-back-examples">';
+      for (const ex of card.examples) {
+        html += `<div class="flip-back-example">${escapeHtml(ex.text)}<button class="speak-btn-tiny" data-speak-ex="${escapeAttr(ex.text)}" type="button">♪</button>`;
+        if (ex.meaning) {
+          html += `<div class="flip-back-example-meaning">${escapeHtml(ex.meaning)}</div>`;
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    if (dir === 't2m') {
+      // Front: term (Spanish)
+      front.innerHTML = `<div class="flip-side-main"></div>`;
+      const fEl = front.querySelector('.flip-side-main');
+      fEl.textContent = card.term;
+      const sBtn = document.createElement('button');
+      sBtn.className = 'speak-btn';
+      sBtn.title = '발음';
+      sBtn.textContent = '♪';
+      sBtn.type = 'button';
+      sBtn.addEventListener('click', e => { e.stopPropagation(); speak(card.term, deckLang); });
+      fEl.appendChild(sBtn);
+      // Back: meaning + examples
+      back.innerHTML = `<div class="flip-side-main flip-side-meaning">${escapeHtml(card.meaning)}</div>` + buildExamplesHtml(card);
+    } else {
+      // Front: meaning (Korean)
+      front.innerHTML = `<div class="flip-side-main flip-side-meaning">${escapeHtml(card.meaning)}</div>`;
+      // Back: term + examples
+      back.innerHTML = `<div class="flip-side-main"></div>` + buildExamplesHtml(card);
+      const bEl = back.querySelector('.flip-side-main');
+      bEl.textContent = card.term;
+      const sBtn = document.createElement('button');
+      sBtn.className = 'speak-btn';
+      sBtn.title = '발음';
+      sBtn.textContent = '♪';
+      sBtn.type = 'button';
+      sBtn.addEventListener('click', e => { e.stopPropagation(); speak(card.term, deckLang); });
+      bEl.appendChild(sBtn);
+    }
+
+    // Wire up example speak buttons (always on back)
+    back.querySelectorAll('[data-speak-ex]').forEach(b => {
+      b.addEventListener('click', e => {
+        e.stopPropagation();
+        speak(b.dataset.speakEx, deckLang);
+      });
+    });
+
+    $('#btnPrevStudy').disabled = studyState.idx === 0;
+    $('#btnNextStudy').textContent = studyState.idx + 1 >= studyState.cards.length ? '끝내기 ✓' : '다음 →';
+  }
+
+  function flipStudyCard() {
+    if (!studyState) return;
+    studyState.flipped = !studyState.flipped;
+    $('#flipCard').classList.toggle('flipped', studyState.flipped);
+  }
+
+  function nextStudyCard() {
+    if (!studyState) return;
+    if (studyState.idx + 1 >= studyState.cards.length) {
+      finishStudy();
+      return;
+    }
+    studyState.idx++;
+    showStudyCard();
+  }
+
+  function prevStudyCard() {
+    if (!studyState) return;
+    if (studyState.idx === 0) return;
+    studyState.idx--;
+    showStudyCard();
+  }
+
+  function finishStudy() {
+    $('#studyView').style.display = 'none';
+    $('#studyDone').style.display = 'block';
+    studyState = null;
+  }
+
+  $('#btnStartStudy').addEventListener('click', startStudy);
+  $('#btnPrevStudy').addEventListener('click', prevStudyCard);
+  $('#btnNextStudy').addEventListener('click', nextStudyCard);
+  $('#btnStudyRestart').addEventListener('click', resetStudyView);
+  $('#flipCard').addEventListener('click', flipStudyCard);
+
+  // Keyboard shortcuts (active only when on study view)
+  document.addEventListener('keydown', e => {
+    if (!studyState) return;
+    if (!$('#panel-study').classList.contains('active')) return;
+    if ($('#studyView').style.display === 'none') return;
+    // Don't intercept if typing in an input
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    if (e.key === ' ') { e.preventDefault(); flipStudyCard(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); nextStudyCard(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); prevStudyCard(); }
+  });
 
   // ===== Quiz =====
   let quizDir = 't2m';
