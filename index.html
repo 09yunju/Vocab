@@ -8,11 +8,11 @@
 <title>Vocabulario.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    /* Mediterranean / Spanish warmth */
+    /* Mediterranean / olive grove palette */
     --paper:      #f5ebd6;   /* warm cream, like aged manuscript */
     --paper-2:    #ecdec4;   /* slightly darker cream for cards */
     --paper-soft: #fbf5e6;   /* lightest tone for inputs on focus */
@@ -21,11 +21,12 @@
     --ink-faint:  #a08066;   /* faded brown */
     --rule:       #c9a87b;   /* warm sand, for borders */
     --rule-soft:  #ddc59c;   /* lighter sand */
-    --accent:     #a82838;   /* Spanish flag-red, vivid */
-    --accent-2:   #c47245;   /* terracotta */
+    --accent:     #5d7437;   /* olive green, primary accent */
+    --accent-2:   #a3a849;   /* light olive */
     --ochre:      #d99d2b;   /* saffron / Andalusian gold */
-    --good:       #6b7d3d;   /* olive green */
+    --good:       #3d5a3d;   /* forest green for correct */
     --olive:      #8a8748;   /* muted olive */
+    --bad:        #8a3a3a;   /* deep wine, only for wrong/error */
 
     --shadow: 0 1px 0 rgba(58, 33, 20, 0.06), 0 14px 42px -12px rgba(58, 33, 20, 0.18);
   }
@@ -35,7 +36,7 @@
   html, body {
     background: var(--paper);
     color: var(--ink);
-    font-family: 'IBM Plex Sans KR', system-ui, sans-serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
@@ -44,8 +45,8 @@
   body {
     background-image:
       radial-gradient(circle at 12% 22%, rgba(217, 157, 43, 0.08) 0%, transparent 45%),
-      radial-gradient(circle at 88% 78%, rgba(168, 40, 56, 0.06) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(196, 114, 69, 0.04) 0%, transparent 60%);
+      radial-gradient(circle at 88% 78%, rgba(93, 116, 55, 0.07) 0%, transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(138, 135, 72, 0.04) 0%, transparent 60%);
   }
 
   .app {
@@ -67,7 +68,7 @@
   }
 
   h1 {
-    font-family: 'Playfair Display', 'Fraunces', 'Gowun Batang', serif;
+    font-family: 'Playfair Display', 'Fraunces', 'Noto Serif KR', serif;
     font-weight: 800;
     font-size: 44px;
     letter-spacing: -0.015em;
@@ -105,7 +106,7 @@
     padding: 6px 14px;
     border-radius: 999px;
     cursor: pointer;
-    font-family: 'IBM Plex Sans KR', sans-serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
@@ -165,7 +166,7 @@
     transition: all 0.1s;
   }
   .deck-menu button:hover { background: var(--paper-2); color: var(--ink); }
-  .deck-menu button.danger:hover { color: var(--accent); }
+  .deck-menu button.danger:hover { color: var(--bad); }
 
   /* ===== Tabs ===== */
   nav.tabs {
@@ -178,7 +179,7 @@
   .tab {
     background: none;
     border: none;
-    font-family: 'IBM Plex Sans KR', sans-serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-size: 14px;
     font-weight: 500;
     padding: 10px 16px;
@@ -233,7 +234,7 @@
     border: 1px solid var(--rule);
     border-radius: 2px;
     padding: 12px 14px;
-    font-family: 'IBM Plex Sans KR', sans-serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-size: 16px;
     color: var(--ink);
     transition: border-color 0.15s, background 0.15s;
@@ -252,7 +253,7 @@
     color: var(--paper);
     border: none;
     padding: 12px 22px;
-    font-family: 'IBM Plex Sans KR', sans-serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -321,7 +322,7 @@
   .example-row {
     background: var(--paper-2);
     border: 1px solid var(--rule);
-    border-left: 3px solid var(--accent-2);
+    border-left: 3px solid var(--ochre);
     border-radius: 2px;
     padding: 14px 14px 8px;
     margin-bottom: 8px;
@@ -351,7 +352,7 @@
     border-radius: 2px;
     line-height: 1;
   }
-  .example-remove:hover { color: var(--accent); }
+  .example-remove:hover { color: var(--bad); }
 
   .add-row-btn {
     background: transparent;
@@ -392,7 +393,7 @@
   }
 
   .word-term {
-    font-family: 'Fraunces', 'Gowun Batang', serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-size: 22px;
     font-weight: 500;
     color: var(--ink);
@@ -427,7 +428,7 @@
     transition: color 0.15s, background 0.15s;
   }
   .word-actions button:hover { color: var(--ink); background: var(--paper-2); }
-  .word-actions button.danger:hover { color: var(--accent); }
+  .word-actions button.danger:hover { color: var(--bad); }
 
   .word-examples {
     margin-top: 10px;
@@ -559,7 +560,7 @@
   }
 
   .quiz-question {
-    font-family: 'Fraunces', 'Gowun Batang', serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-size: 38px;
     font-weight: 500;
     line-height: 1.2;
@@ -626,7 +627,7 @@
     flex: 1 1 0;
     min-width: 0;
     padding: 10px 6px;
-    font-family: 'IBM Plex Sans KR', sans-serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-size: 13px;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -649,7 +650,7 @@
     font-style: italic;
     opacity: 0.8;
   }
-  .btn-again { background: var(--accent); }
+  .btn-again { background: var(--bad); }
   .btn-hard { background: var(--accent-2); }
   .btn-grade.btn-good { background: var(--good); color: var(--paper); }
   .btn-easy { background: var(--olive); }
@@ -708,7 +709,7 @@
     border-bottom: 2px solid;
   }
   .blank-filled.correct { color: var(--good); border-color: var(--good); }
-  .blank-filled.wrong { color: var(--accent); border-color: var(--accent); }
+  .blank-filled.wrong { color: var(--bad); border-color: var(--bad); }
 
   .quiz-blank-input-row {
     margin-top: 24px;
@@ -719,7 +720,7 @@
     flex-wrap: wrap;
   }
   .quiz-blank-input-row input {
-    font-family: 'Fraunces', 'Gowun Batang', serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-size: 20px;
     padding: 10px 16px;
     background: var(--paper);
@@ -736,7 +737,7 @@
   }
 
   .quiz-feedback {
-    font-family: 'Fraunces', 'Gowun Batang', serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-weight: 500;
     display: inline;
   }
@@ -744,7 +745,7 @@
   .quiz-feedback.wrong { color: var(--ink-soft); }
   .quiz-feedback .user-ans {
     text-decoration: line-through;
-    color: var(--accent);
+    color: var(--bad);
     margin-right: 6px;
   }
   .quiz-feedback .arrow {
@@ -801,7 +802,7 @@
     border-bottom: 1px solid var(--paper-2);
   }
   .result-missed-item .t {
-    font-family: 'Fraunces', 'Gowun Batang', serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-size: 17px;
     font-weight: 500;
   }
@@ -876,7 +877,7 @@
     transition: all 0.15s;
   }
   .btn-tiny:hover { color: var(--ink); border-color: var(--ink-soft); }
-  .btn-tiny.danger:hover { color: var(--accent); border-color: var(--accent); }
+  .btn-tiny.danger:hover { color: var(--bad); border-color: var(--bad); }
 
   /* Toast */
   .toast {
@@ -906,7 +907,7 @@
     background: var(--paper);
     background-image:
       radial-gradient(circle at 20% 30%, rgba(217, 157, 43, 0.1) 0%, transparent 45%),
-      radial-gradient(circle at 80% 70%, rgba(168, 40, 56, 0.08) 0%, transparent 45%);
+      radial-gradient(circle at 80% 70%, rgba(93, 116, 55, 0.08) 0%, transparent 45%);
     z-index: 500;
     display: flex;
     align-items: center;
@@ -939,7 +940,7 @@
     border: 1px solid var(--rule);
     border-radius: 2px;
     padding: 12px 14px;
-    font-family: 'IBM Plex Sans KR', sans-serif;
+    font-family: 'Fraunces', 'Noto Serif KR', serif;
     font-size: 16px;
     color: var(--ink);
   }
@@ -949,7 +950,7 @@
     background: var(--paper-soft);
   }
   .auth-error {
-    color: var(--accent);
+    color: var(--bad);
     font-family: 'Fraunces', serif;
     font-style: italic;
     font-size: 13px;
@@ -980,7 +981,7 @@
   .sync-status.synced::before { background: var(--good); }
   .sync-status.syncing::before { background: var(--accent-2); animation: pulse 1s infinite; }
   .sync-status.offline::before { background: var(--ink-faint); }
-  .sync-status.error::before { background: var(--accent); }
+  .sync-status.error::before { background: var(--bad); }
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
