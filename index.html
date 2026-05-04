@@ -5,24 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>단어장</title>
+<title>Vocabulario.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --paper: #f4efe4;
-    --paper-2: #ebe4d3;
-    --ink: #1f1a14;
-    --ink-soft: #4a3f30;
-    --ink-faint: #8a7b62;
-    --rule: #c9bfa6;
-    --accent: #8b1e1e;
-    --accent-soft: #b85a3c;
-    --good: #3d5a3d;
-    --bad: #8b1e1e;
-    --shadow: 0 1px 0 rgba(31, 26, 20, 0.06), 0 12px 40px -12px rgba(31, 26, 20, 0.18);
+    /* Mediterranean / Spanish warmth */
+    --paper:      #f5ebd6;   /* warm cream, like aged manuscript */
+    --paper-2:    #ecdec4;   /* slightly darker cream for cards */
+    --paper-soft: #fbf5e6;   /* lightest tone for inputs on focus */
+    --ink:        #3a2114;   /* deep warm brown */
+    --ink-soft:   #5e3a26;   /* medium brown */
+    --ink-faint:  #a08066;   /* faded brown */
+    --rule:       #c9a87b;   /* warm sand, for borders */
+    --rule-soft:  #ddc59c;   /* lighter sand */
+    --accent:     #a82838;   /* Spanish flag-red, vivid */
+    --accent-2:   #c47245;   /* terracotta */
+    --ochre:      #d99d2b;   /* saffron / Andalusian gold */
+    --good:       #6b7d3d;   /* olive green */
+    --olive:      #8a8748;   /* muted olive */
+
+    --shadow: 0 1px 0 rgba(58, 33, 20, 0.06), 0 14px 42px -12px rgba(58, 33, 20, 0.18);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,21 +43,22 @@
 
   body {
     background-image:
-      radial-gradient(circle at 20% 30%, rgba(139, 30, 30, 0.03) 0%, transparent 40%),
-      radial-gradient(circle at 80% 70%, rgba(74, 63, 48, 0.04) 0%, transparent 40%);
+      radial-gradient(circle at 12% 22%, rgba(217, 157, 43, 0.08) 0%, transparent 45%),
+      radial-gradient(circle at 88% 78%, rgba(168, 40, 56, 0.06) 0%, transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(196, 114, 69, 0.04) 0%, transparent 60%);
   }
 
   .app {
     max-width: 720px;
     margin: 0 auto;
-    padding: 32px 24px 80px;
+    padding: 36px 24px 80px;
   }
 
-  /* Header */
+  /* ===== Header ===== */
   header {
     border-bottom: 1px solid var(--rule);
-    padding-bottom: 20px;
-    margin-bottom: 16px;
+    padding-bottom: 22px;
+    margin-bottom: 18px;
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -61,11 +67,12 @@
   }
 
   h1 {
-    font-family: 'Fraunces', 'Gowun Batang', serif;
-    font-weight: 500;
-    font-size: 38px;
-    letter-spacing: -0.02em;
+    font-family: 'Playfair Display', 'Fraunces', 'Gowun Batang', serif;
+    font-weight: 800;
+    font-size: 44px;
+    letter-spacing: -0.015em;
     line-height: 1;
+    color: var(--ink);
   }
 
   h1 .dot { color: var(--accent); }
@@ -77,17 +84,16 @@
     color: var(--ink-faint);
   }
 
-  /* Deck bar */
+  /* ===== Deck pills ===== */
   .deck-bar {
     display: flex;
     gap: 6px;
     overflow-x: auto;
-    padding: 4px 0 14px;
-    margin-bottom: 14px;
+    padding: 6px 0 16px;
+    margin-bottom: 16px;
     border-bottom: 1px dashed var(--rule);
     -webkit-overflow-scrolling: touch;
   }
-
   .deck-bar::-webkit-scrollbar { height: 4px; }
   .deck-bar::-webkit-scrollbar-track { background: transparent; }
   .deck-bar::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
@@ -120,25 +126,24 @@
     border-style: dashed;
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 13px;
   }
   .deck-pill .deck-count {
     font-family: 'Fraunces', serif;
     font-style: italic;
     font-size: 11px;
-    opacity: 0.65;
+    opacity: 0.7;
   }
-  .deck-pill.active .deck-count { color: var(--paper); opacity: 0.65; }
+  .deck-pill.active .deck-count { color: var(--paper); opacity: 0.7; }
 
   .deck-menu {
     position: fixed;
     background: var(--paper);
     border: 1px solid var(--ink-soft);
     border-radius: 3px;
-    box-shadow: 0 12px 32px rgba(31, 26, 20, 0.18);
+    box-shadow: 0 12px 32px rgba(58, 33, 20, 0.22);
     padding: 4px;
     z-index: 100;
-    min-width: 150px;
+    min-width: 160px;
     animation: menuIn 0.12s ease;
   }
   @keyframes menuIn {
@@ -162,11 +167,11 @@
   .deck-menu button:hover { background: var(--paper-2); color: var(--ink); }
   .deck-menu button.danger:hover { color: var(--accent); }
 
-  /* Tabs */
+  /* ===== Tabs ===== */
   nav.tabs {
     display: flex;
     gap: 4px;
-    margin-bottom: 28px;
+    margin-bottom: 30px;
     border-bottom: 1px solid var(--rule);
   }
 
@@ -183,7 +188,6 @@
     transition: color 0.15s;
     letter-spacing: 0.02em;
   }
-
   .tab:hover { color: var(--ink-soft); }
   .tab.active { color: var(--ink); }
   .tab.active::after {
@@ -195,7 +199,6 @@
     height: 2px;
     background: var(--accent);
   }
-
   .tab .count {
     font-family: 'Fraunces', serif;
     font-style: italic;
@@ -204,16 +207,15 @@
     margin-left: 4px;
   }
 
-  /* Panels */
+  /* ===== Panels ===== */
   .panel { display: none; animation: fade 0.25s ease; }
   .panel.active { display: block; }
-
   @keyframes fade {
     from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Forms */
+  /* ===== Forms ===== */
   .field { margin-bottom: 18px; }
 
   label {
@@ -236,11 +238,10 @@
     color: var(--ink);
     transition: border-color 0.15s, background 0.15s;
   }
-
   input[type="text"]:focus, textarea:focus {
     outline: none;
     border-color: var(--ink-soft);
-    background: #fbf8ef;
+    background: var(--paper-soft);
   }
 
   textarea { resize: vertical; min-height: 60px; font-family: inherit; }
@@ -285,20 +286,29 @@
     color: var(--ink-soft);
   }
 
-  /* Expression rows in form */
+  /* ===== Section divider with ornament ===== */
   .section-divider {
-    margin: 24px 0 12px;
-    padding-bottom: 8px;
+    margin: 24px 0 14px;
+    padding-bottom: 6px;
     border-bottom: 1px dashed var(--rule);
     display: flex;
     align-items: baseline;
     justify-content: space-between;
+    gap: 12px;
   }
   .section-divider .title {
     font-family: 'Fraunces', serif;
     font-style: italic;
     font-size: 14px;
     color: var(--ink-soft);
+  }
+  .section-divider .ornament {
+    color: var(--accent-2);
+    font-size: 11px;
+    flex: 1;
+    text-align: center;
+    letter-spacing: 0.4em;
+    opacity: 0.6;
   }
   .section-divider .hint {
     font-family: 'Fraunces', serif;
@@ -307,29 +317,28 @@
     color: var(--ink-faint);
   }
 
-  .expr-row {
+  /* Example rows in form */
+  .example-row {
     background: var(--paper-2);
     border: 1px solid var(--rule);
-    border-left: 3px solid var(--accent);
+    border-left: 3px solid var(--accent-2);
     border-radius: 2px;
     padding: 14px 14px 8px;
     margin-bottom: 8px;
     position: relative;
   }
-  .expr-row .field { margin-bottom: 10px; }
-  .expr-row label {
+  .example-row .field { margin-bottom: 10px; }
+  .example-row label {
     font-size: 11px;
     margin-bottom: 4px;
   }
-  .expr-row input, .expr-row textarea {
-    background: var(--paper);
+  .example-row input, .example-row textarea {
+    background: var(--paper-soft);
     font-size: 14px;
     padding: 8px 10px;
   }
-  .expr-row textarea {
-    min-height: 38px;
-  }
-  .expr-remove {
+  .example-row textarea { min-height: 38px; }
+  .example-remove {
     position: absolute;
     top: 6px;
     right: 6px;
@@ -342,9 +351,9 @@
     border-radius: 2px;
     line-height: 1;
   }
-  .expr-remove:hover { color: var(--accent); }
+  .example-remove:hover { color: var(--accent); }
 
-  .expr-add-btn {
+  .add-row-btn {
     background: transparent;
     border: 1px dashed var(--rule);
     color: var(--ink-faint);
@@ -358,9 +367,9 @@
     margin-bottom: 18px;
     transition: all 0.15s;
   }
-  .expr-add-btn:hover { color: var(--ink); border-color: var(--ink-soft); }
+  .add-row-btn:hover { color: var(--ink); border-color: var(--ink-soft); }
 
-  /* Word list */
+  /* ===== Word list ===== */
   .toolbar {
     display: flex;
     gap: 8px;
@@ -388,20 +397,12 @@
     font-weight: 500;
     color: var(--ink);
     letter-spacing: -0.01em;
+    word-break: keep-all;
   }
-
   .word-meaning {
     font-size: 15px;
     color: var(--ink-soft);
     margin-top: 2px;
-  }
-
-  .word-note {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 13px;
-    color: var(--ink-faint);
-    margin-top: 4px;
   }
 
   .word-actions {
@@ -414,9 +415,7 @@
     gap: 8px;
     align-items: center;
   }
-
   .word-actions .stats { white-space: nowrap; }
-
   .word-actions button {
     background: none;
     border: none;
@@ -430,60 +429,29 @@
   .word-actions button:hover { color: var(--ink); background: var(--paper-2); }
   .word-actions button.danger:hover { color: var(--accent); }
 
-  /* Expression list inside word item */
-  .word-expressions {
+  .word-examples {
     margin-top: 10px;
-    margin-left: 0;
     padding-left: 14px;
     border-left: 2px solid var(--rule);
   }
-  .word-expr {
-    padding: 8px 0;
+  .word-example {
+    padding: 6px 0;
   }
-  .word-expr:not(:last-child) {
+  .word-example:not(:last-child) {
     border-bottom: 1px dotted var(--rule);
   }
-  .word-expr-head {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .word-expr-phrase {
-    font-family: 'Fraunces', 'Gowun Batang', serif;
-    font-weight: 500;
-    color: var(--ink);
-    font-size: 16px;
-  }
-  .word-expr-meaning {
-    color: var(--ink-soft);
-    font-size: 13px;
-  }
-  .word-expr-meaning::before {
-    content: '·';
-    margin-right: 6px;
-    color: var(--ink-faint);
-  }
-  .word-expr-example {
+  .word-example-text {
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 13px;
-    color: var(--ink-faint);
-    margin-top: 3px;
+    font-size: 14px;
+    color: var(--ink-soft);
   }
-  .word-expr-example-meaning {
+  .word-example-meaning {
     font-size: 12px;
     color: var(--ink-faint);
     margin-top: 1px;
     padding-left: 12px;
     border-left: 2px solid var(--paper-2);
-  }
-  .word-expr-stats {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 11px;
-    color: var(--ink-faint);
-    margin-left: auto;
   }
 
   .empty {
@@ -494,8 +462,16 @@
     font-style: italic;
     font-size: 16px;
   }
+  .empty .ornament {
+    display: block;
+    color: var(--accent-2);
+    font-size: 14px;
+    letter-spacing: 0.5em;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
 
-  /* Quiz */
+  /* ===== Quiz ===== */
   .quiz-setup {
     background: var(--paper-2);
     border: 1px solid var(--rule);
@@ -503,12 +479,12 @@
     border-radius: 2px;
     margin-bottom: 20px;
   }
-
   .quiz-setup h3 {
-    font-family: 'Fraunces', serif;
+    font-family: 'Playfair Display', 'Fraunces', serif;
     font-weight: 500;
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 16px;
+    letter-spacing: -0.01em;
   }
 
   .opt-row {
@@ -517,7 +493,6 @@
     margin-bottom: 0;
     flex-wrap: wrap;
   }
-
   .opt {
     background: var(--paper);
     border: 1px solid var(--rule);
@@ -535,7 +510,6 @@
     color: var(--paper);
     border-color: var(--ink);
   }
-
   .quiz-deck-count {
     font-family: 'Fraunces', serif;
     font-style: italic;
@@ -554,7 +528,6 @@
     position: relative;
     overflow: hidden;
   }
-
   .quiz-card::before {
     content: '';
     position: absolute;
@@ -573,14 +546,13 @@
     position: relative;
     z-index: 1;
   }
-
   .quiz-kind {
     font-family: 'Fraunces', serif;
     font-style: italic;
     font-size: 11px;
     color: var(--accent);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
     margin-bottom: 18px;
     position: relative;
     z-index: 1;
@@ -597,25 +569,9 @@
     z-index: 1;
     word-break: keep-all;
   }
-
   .quiz-question.is-sentence {
     font-size: 24px;
     line-height: 1.5;
-    font-weight: 500;
-  }
-
-  .quiz-question.is-phrase {
-    font-size: 30px;
-  }
-
-  .quiz-context {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 13px;
-    color: var(--ink-faint);
-    margin-bottom: 8px;
-    position: relative;
-    z-index: 1;
   }
 
   .quiz-hint {
@@ -638,7 +594,6 @@
     z-index: 1;
     animation: fade 0.3s ease;
   }
-
   .quiz-answer .note {
     display: block;
     margin-top: 8px;
@@ -659,20 +614,13 @@
     z-index: 1;
   }
 
-  .btn-good { background: var(--good); color: var(--paper); }
-  .btn-good:hover { background: #2d432d; }
-  .btn-bad { background: var(--bad); color: var(--paper); }
-  .btn-bad:hover { background: #6b1717; }
-
   /* SRS 4-grade buttons */
   .grade-row {
     display: flex;
     gap: 6px;
-    margin-top: 24px;
     justify-content: center;
     flex-wrap: nowrap;
-    position: relative;
-    z-index: 1;
+    width: 100%;
   }
   .btn-grade {
     flex: 1 1 0;
@@ -692,20 +640,21 @@
     gap: 2px;
     transition: transform 0.1s, filter 0.15s;
   }
-  .btn-grade:hover { filter: brightness(1.1); }
+  .btn-grade:hover { filter: brightness(1.08); }
   .btn-grade:active { transform: translateY(1px); }
   .btn-grade .interval {
     font-size: 10px;
     font-weight: 400;
     font-family: 'Fraunces', serif;
     font-style: italic;
-    opacity: 0.75;
+    opacity: 0.8;
   }
-  .btn-again { background: #8b1e1e; }
-  .btn-hard { background: #b85a3c; }
-  .btn-grade.btn-good { background: #3d5a3d; }
-  .btn-easy { background: #5a7a5a; }
+  .btn-again { background: var(--accent); }
+  .btn-hard { background: var(--accent-2); }
+  .btn-grade.btn-good { background: var(--good); color: var(--paper); }
+  .btn-easy { background: var(--olive); }
 
+  /* Speak buttons */
   .speak-btn {
     background: none;
     border: 1px solid var(--rule);
@@ -722,7 +671,11 @@
     justify-content: center;
     font-size: 13px;
   }
-  .speak-btn:hover { background: var(--paper); color: var(--accent); }
+  .speak-btn:hover {
+    background: var(--paper-soft);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
 
   .speak-btn-tiny {
     background: none;
@@ -738,7 +691,7 @@
   }
   .speak-btn-tiny:hover { color: var(--accent); }
 
-  /* Blank quiz mode */
+  /* Blank quiz visuals */
   .blank-mark {
     display: inline-block;
     min-width: 70px;
@@ -764,8 +717,6 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    position: relative;
-    z-index: 1;
   }
   .quiz-blank-input-row input {
     font-family: 'Fraunces', 'Gowun Batang', serif;
@@ -781,7 +732,7 @@
   .quiz-blank-input-row input:focus {
     outline: none;
     border-color: var(--ink);
-    background: #fbf8ef;
+    background: var(--paper-soft);
   }
 
   .quiz-feedback {
@@ -808,19 +759,27 @@
     text-align: center;
     padding: 40px 20px;
   }
+  .result-ornament {
+    color: var(--accent-2);
+    letter-spacing: 0.5em;
+    font-size: 14px;
+    opacity: 0.5;
+    margin-bottom: 20px;
+  }
   .result-score {
-    font-family: 'Fraunces', serif;
+    font-family: 'Playfair Display', 'Fraunces', serif;
     font-size: 64px;
-    font-weight: 500;
+    font-weight: 700;
     line-height: 1;
     margin-bottom: 8px;
   }
-  .result-score .slash { color: var(--ink-faint); margin: 0 4px; }
+  .result-score .slash { color: var(--ink-faint); margin: 0 4px; font-weight: 400; }
   .result-label {
     font-family: 'Fraunces', serif;
     font-style: italic;
     color: var(--ink-faint);
     margin-bottom: 32px;
+    font-size: 15px;
   }
 
   .result-missed {
@@ -855,17 +814,17 @@
     font-family: 'Fraunces', serif;
     font-style: italic;
     font-size: 11px;
-    color: var(--ink-faint);
+    color: var(--accent);
     margin-bottom: 2px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
   }
 
   /* Modal */
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(31, 26, 20, 0.4);
+    background: rgba(58, 33, 20, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -877,7 +836,7 @@
     background: var(--paper);
     border: 1px solid var(--rule);
     border-radius: 3px;
-    box-shadow: 0 24px 60px rgba(31, 26, 20, 0.3);
+    box-shadow: 0 24px 60px rgba(58, 33, 20, 0.3);
     width: 100%;
     max-width: 580px;
     max-height: calc(100vh - 40px);
@@ -885,10 +844,11 @@
     padding: 28px;
   }
   .modal h3 {
-    font-family: 'Fraunces', serif;
+    font-family: 'Playfair Display', 'Fraunces', serif;
     font-weight: 500;
-    font-size: 22px;
+    font-size: 24px;
     margin-bottom: 20px;
+    letter-spacing: -0.01em;
   }
 
   /* Footer */
@@ -902,8 +862,7 @@
     justify-content: space-between;
     align-items: center;
   }
-
-  footer .left, footer .right { display: flex; gap: 8px; flex-wrap: wrap; }
+  footer .left, footer .right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
   .btn-tiny {
     background: none;
@@ -945,6 +904,9 @@
     position: fixed;
     inset: 0;
     background: var(--paper);
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(217, 157, 43, 0.1) 0%, transparent 45%),
+      radial-gradient(circle at 80% 70%, rgba(168, 40, 56, 0.08) 0%, transparent 45%);
     z-index: 500;
     display: flex;
     align-items: center;
@@ -956,10 +918,10 @@
     max-width: 360px;
   }
   .auth-card h2 {
-    font-family: 'Fraunces', 'Gowun Batang', serif;
-    font-weight: 500;
-    font-size: 36px;
-    letter-spacing: -0.02em;
+    font-family: 'Playfair Display', 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 42px;
+    letter-spacing: -0.015em;
     margin-bottom: 6px;
   }
   .auth-card h2 .dot { color: var(--accent); }
@@ -984,7 +946,7 @@
   .auth-card input:focus {
     outline: none;
     border-color: var(--ink-soft);
-    background: #fbf8ef;
+    background: var(--paper-soft);
   }
   .auth-error {
     color: var(--accent);
@@ -994,14 +956,10 @@
     margin-bottom: 12px;
     min-height: 18px;
   }
-  .auth-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-  }
+  .auth-actions { display: flex; gap: 8px; margin-top: 8px; }
   .auth-actions .btn { flex: 1; }
 
-  /* Sync status badge in footer */
+  /* Sync status */
   .sync-status {
     font-family: 'Fraunces', serif;
     font-style: italic;
@@ -1020,7 +978,7 @@
     background: var(--ink-faint);
   }
   .sync-status.synced::before { background: var(--good); }
-  .sync-status.syncing::before { background: #b85a3c; animation: pulse 1s infinite; }
+  .sync-status.syncing::before { background: var(--accent-2); animation: pulse 1s infinite; }
   .sync-status.offline::before { background: var(--ink-faint); }
   .sync-status.error::before { background: var(--accent); }
   @keyframes pulse {
@@ -1029,21 +987,21 @@
   }
 
   @media (max-width: 480px) {
-    .app { padding: 20px 16px 60px; }
-    h1 { font-size: 30px; }
+    .app { padding: 24px 16px 60px; }
+    h1 { font-size: 32px; }
     .quiz-question { font-size: 30px; }
     .quiz-question.is-sentence { font-size: 20px; }
-    .quiz-question.is-phrase { font-size: 24px; }
     .quiz-card { padding: 36px 20px; }
-    .result-score { font-size: 48px; }
-    .modal { padding: 20px; }
+    .result-score { font-size: 50px; }
+    .modal { padding: 22px; }
+    .auth-card h2 { font-size: 36px; }
   }
 </style>
 </head>
 <body>
 <div class="app">
   <header>
-    <h1>단어장<span class="dot">.</span></h1>
+    <h1>Vocabulario<span class="dot">.</span></h1>
     <div class="meta" id="meta">시작해보자</div>
   </header>
 
@@ -1060,20 +1018,21 @@
     <div class="add-context" id="addContext"></div>
 
     <div class="field">
-      <label>단어 / Term (헤드워드)</label>
-      <input type="text" id="inputTerm" placeholder="예: la cabeza" autocomplete="off">
+      <label>단어 / Palabra</label>
+      <input type="text" id="inputTerm" placeholder="예: la cabeza  ·  levantar la cabeza" autocomplete="off">
     </div>
     <div class="field">
-      <label>뜻 / Meaning</label>
-      <input type="text" id="inputMeaning" placeholder="예: 고개" autocomplete="off">
+      <label>뜻</label>
+      <input type="text" id="inputMeaning" placeholder="예: 고개  ·  고개를 들다" autocomplete="off">
     </div>
 
     <div class="section-divider">
-      <span class="title">표현 (Expressions) — 선택</span>
-      <span class="hint">단어가 사용되는 표현들</span>
+      <span class="title">예문 (Ejemplos)</span>
+      <span class="ornament">· · ·</span>
+      <span class="hint">선택, 여러 개 가능</span>
     </div>
-    <div id="exprList"></div>
-    <button class="expr-add-btn" id="btnAddExpr">+ 표현 추가</button>
+    <div id="exampleList"></div>
+    <button class="add-row-btn" id="btnAddExample">+ 예문 추가</button>
 
     <div class="btn-row">
       <button class="btn" id="btnAdd">추가하기</button>
@@ -1100,8 +1059,8 @@
       <div class="field">
         <label>방향</label>
         <div class="opt-row" id="dirOpts">
-          <button class="opt active" data-dir="t2m">단어/표현 → 뜻</button>
-          <button class="opt" data-dir="m2t">뜻 → 단어/표현</button>
+          <button class="opt active" data-dir="t2m">단어 → 뜻</button>
+          <button class="opt" data-dir="m2t">뜻 → 단어</button>
           <button class="opt" data-dir="blank">빈칸 (예문)</button>
           <button class="opt" data-dir="mix">섞기</button>
         </div>
@@ -1121,7 +1080,6 @@
     <div id="quizCard" class="quiz-card" style="display:none;">
       <div class="quiz-progress" id="quizProgress"></div>
       <div class="quiz-kind" id="quizKind"></div>
-      <div class="quiz-context" id="quizContext"></div>
       <div class="quiz-question" id="quizQuestion"></div>
       <div class="quiz-hint" id="quizHint"></div>
       <div class="quiz-answer" id="quizAnswer" style="display:none;"></div>
@@ -1129,6 +1087,7 @@
     </div>
 
     <div id="quizResult" class="result" style="display:none;">
+      <div class="result-ornament">· · ·</div>
       <div class="result-score">
         <span id="resCorrect">0</span><span class="slash">/</span><span id="resTotal">0</span>
       </div>
@@ -1155,13 +1114,13 @@
   </footer>
 </div>
 
-<!-- Edit Modal -->
+<!-- Edit Modal placeholder -->
 <div id="editModal" style="display:none;"></div>
 
 <!-- Auth overlay -->
 <div class="auth-overlay" id="authOverlay" style="display:none;">
   <div class="auth-card">
-    <h2>단어장<span class="dot">.</span></h2>
+    <h2>Vocabulario<span class="dot">.</span></h2>
     <div class="auth-sub" id="authSub">시작하려면 로그인 또는 회원가입</div>
     <div class="field">
       <input type="email" id="authEmail" placeholder="이메일" autocomplete="email">
@@ -1194,7 +1153,7 @@
 
   let currentUser = null;
 
-  const STORAGE_KEY = 'vocab.v2';
+  const STORAGE_KEY = 'vocab.v2'; // continue using same key; data shape includes a version field
   const OLD_KEY = 'vocab.v1';
 
   let state = {
@@ -1219,7 +1178,6 @@
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
   function escapeAttr(s) { return escapeHtml(s); }
-
   function escapeRegex(s) {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
@@ -1235,14 +1193,82 @@
   function getCurrentDeck() {
     return state.decks.find(d => d.id === state.currentDeckId);
   }
-
   function wordsInDeck(deckId) {
     return state.words.filter(w => w.deckId === deckId);
   }
 
-  function ensureExpressions(w) {
-    if (!Array.isArray(w.expressions)) w.expressions = [];
-    return w;
+  // ===== SRS =====
+  const DAY_MS = 86400000;
+  function defaultSrs() {
+    return { due: 0, interval: 0, ease: 2.5, reps: 0, lapses: 0 };
+  }
+  function ensureSrs(obj, key) {
+    if (!obj[key] || typeof obj[key].due !== 'number') obj[key] = defaultSrs();
+  }
+  function ensureWord(w) {
+    if (!Array.isArray(w.examples)) w.examples = [];
+    ensureSrs(w, 'srs');
+    ensureSrs(w, 'srsBlank');
+  }
+
+  function updateSrs(srs, rating) {
+    const now = Date.now();
+    let { interval, ease, reps, lapses } = srs;
+    let dueMs;
+    const isNew = reps === 0;
+
+    if (rating === 'again') {
+      if (reps > 0) lapses += 1;
+      interval = 0;
+      reps = 0;
+      ease = Math.max(1.3, ease - 0.2);
+      dueMs = now + 60000;
+    } else if (rating === 'hard') {
+      if (isNew) {
+        interval = 0;
+        dueMs = now + 6 * 60000;
+      } else {
+        interval = Math.max(Math.round(interval * 1.2), interval + 1);
+        dueMs = now + interval * DAY_MS;
+        reps += 1;
+      }
+      ease = Math.max(1.3, ease - 0.15);
+    } else if (rating === 'good') {
+      if (isNew) { interval = 1; reps = 1; }
+      else { interval = Math.max(1, Math.round(interval * ease)); reps += 1; }
+      dueMs = now + interval * DAY_MS;
+    } else if (rating === 'easy') {
+      if (isNew) { interval = 4; reps = 1; }
+      else { interval = Math.max(1, Math.round(interval * ease * 1.3)); reps += 1; }
+      ease = Math.min(3.0, ease + 0.15);
+      dueMs = now + interval * DAY_MS;
+    }
+    return { due: dueMs, interval, ease, reps, lapses };
+  }
+
+  function formatTime(ms) {
+    if (ms < 0) ms = 0;
+    const min = ms / 60000;
+    if (min < 60) return Math.max(1, Math.round(min)) + '분';
+    const hr = ms / 3600000;
+    if (hr < 24) return Math.round(hr) + '시간';
+    const day = ms / 86400000;
+    if (day < 30) return Math.round(day) + '일';
+    if (day < 365) return Math.round(day / 30) + '달';
+    return (day / 365).toFixed(1) + '년';
+  }
+  function previewInterval(srs, rating) {
+    const ns = updateSrs(srs, rating);
+    return formatTime(ns.due - Date.now());
+  }
+
+  function getCardSrs(card) {
+    if (card.kind === 'term') return card.word.srs;
+    if (card.kind === 'blank') return card.word.srsBlank;
+  }
+  function setCardSrs(card, ns) {
+    if (card.kind === 'term') card.word.srs = ns;
+    else if (card.kind === 'blank') card.word.srsBlank = ns;
   }
 
   // ===== Storage / Migration =====
@@ -1253,6 +1279,7 @@
 
   function saveLocal() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      version: 3,
       decks: state.decks,
       currentDeckId: state.currentDeckId,
       words: state.words,
@@ -1261,45 +1288,118 @@
     updateMeta();
   }
 
+  // Migrate any old shape into the new flat shape: {decks, currentDeckId, words[]}
+  // where each word: {id, deckId, term, meaning, examples[{id,text,meaning}], srs, srsBlank, correct, wrong, created}
+  function migrateData(raw) {
+    if (!raw) return null;
+
+    // v1: flat array of words (no decks). Build a "기본" deck.
+    if (Array.isArray(raw)) {
+      const def = { id: 'd_' + uid(), name: '기본', created: Date.now() };
+      const words = raw.map(w => {
+        const nw = {
+          id: w.id || uid(),
+          deckId: def.id,
+          term: w.term, meaning: w.meaning,
+          examples: w.note ? [{ id: uid(), text: w.note, meaning: '' }] : [],
+          created: w.created || Date.now(),
+          correct: w.correct || 0,
+          wrong: w.wrong || 0
+        };
+        ensureWord(nw);
+        return nw;
+      });
+      return { decks: [def], currentDeckId: def.id, words, lastSyncedAt: 0 };
+    }
+
+    // Detect format. v3 (current) has version=3 OR words have 'examples' but no 'expressions'.
+    // v2 has words with 'expressions' nested.
+    const sample = (raw.words || [])[0];
+    const isV3 = raw.version === 3 || (sample && Array.isArray(sample.examples) && !('expressions' in sample));
+    if (isV3) {
+      // Just ensure SRS etc
+      (raw.words || []).forEach(ensureWord);
+      return raw;
+    }
+
+    // v2 → v3: flatten expressions into separate top-level words
+    const newWords = [];
+    for (const w of (raw.words || [])) {
+      // Headword as a flat word
+      const head = {
+        id: w.id || uid(),
+        deckId: w.deckId,
+        term: w.term,
+        meaning: w.meaning,
+        examples: [],
+        created: w.created || Date.now(),
+        correct: w.correct || 0,
+        wrong: w.wrong || 0
+      };
+      if (w.srs) head.srs = w.srs;
+      ensureWord(head);
+      newWords.push(head);
+
+      // Each expression becomes its own word
+      for (const e of (w.expressions || [])) {
+        const ew = {
+          id: e.id || uid(),
+          deckId: w.deckId,
+          term: e.phrase,
+          meaning: e.meaning,
+          examples: e.example ? [{ id: uid(), text: e.example, meaning: e.exampleMeaning || '' }] : [],
+          created: w.created || Date.now(),
+          correct: e.correct || 0,
+          wrong: e.wrong || 0
+        };
+        if (e.srs) ew.srs = e.srs;
+        if (e.srsBlank) ew.srsBlank = e.srsBlank;
+        ensureWord(ew);
+        newWords.push(ew);
+      }
+    }
+    return {
+      version: 3,
+      decks: raw.decks || [],
+      currentDeckId: raw.currentDeckId,
+      words: newWords,
+      lastSyncedAt: raw.lastSyncedAt || 0
+    };
+  }
+
   function load() {
     try {
-      const v2 = localStorage.getItem(STORAGE_KEY);
-      if (v2) {
-        const data = JSON.parse(v2);
-        state.decks = Array.isArray(data.decks) ? data.decks : [];
-        state.currentDeckId = data.currentDeckId;
-        state.lastSyncedAt = data.lastSyncedAt || 0;
-        state.words = Array.isArray(data.words) ? data.words.map(w => {
-          ensureExpressions(w);
-          ensureWordSrs(w);
-          w.expressions.forEach(ensureExprSrs);
-          return w;
-        }) : [];
+      const v2raw = localStorage.getItem(STORAGE_KEY);
+      if (v2raw) {
+        const data = migrateData(JSON.parse(v2raw));
+        if (data) applyData(data);
+        if (data && data.version !== 3) saveLocal(); // persist migration
         ensureValidDeckState();
         return;
       }
-      const v1 = localStorage.getItem(OLD_KEY);
-      if (v1) {
-        const oldWords = JSON.parse(v1);
-        const def = { id: 'd_' + uid(), name: '기본', created: Date.now() };
-        state.decks = [def];
-        state.currentDeckId = def.id;
-        state.words = (Array.isArray(oldWords) ? oldWords : []).map(w => {
-          const nw = { ...w, deckId: def.id, expressions: [] };
-          ensureWordSrs(nw);
-          return nw;
-        });
-        save();
+      const v1raw = localStorage.getItem(OLD_KEY);
+      if (v1raw) {
+        const data = migrateData(JSON.parse(v1raw));
+        if (data) {
+          applyData(data);
+          saveLocal();
+        }
+        ensureValidDeckState();
         return;
       }
       ensureValidDeckState();
     } catch (e) {
       console.error('Load failed:', e);
-      state.decks = [];
-      state.currentDeckId = null;
-      state.words = [];
       ensureValidDeckState();
     }
+  }
+
+  function applyData(data) {
+    state.decks = Array.isArray(data.decks) ? data.decks : [];
+    state.currentDeckId = data.currentDeckId;
+    state.words = Array.isArray(data.words) ? data.words : [];
+    state.lastSyncedAt = data.lastSyncedAt || 0;
+    state.words.forEach(ensureWord);
   }
 
   function ensureValidDeckState() {
@@ -1328,7 +1428,7 @@
 
   async function syncPull() {
     if (!currentUser || isSyncing) return;
-    if (state.quiz) return; // don't disrupt active quiz
+    if (state.quiz) return;
     if (!navigator.onLine) { setSyncStatus('offline'); return; }
     isSyncing = true;
     setSyncStatus('syncing');
@@ -1341,27 +1441,25 @@
       if (error) throw error;
 
       if (!data) {
-        // Server has no row yet — push local data up
         await syncPush(true);
         return;
       }
 
       const serverTime = new Date(data.updated_at).getTime();
       if (serverTime > (state.lastSyncedAt || 0)) {
-        // Server is newer; replace local state
-        const d = data.data || {};
-        state.decks = Array.isArray(d.decks) ? d.decks : [];
-        state.currentDeckId = d.currentDeckId;
-        state.words = Array.isArray(d.words) ? d.words.map(w => {
-          ensureExpressions(w);
-          ensureWordSrs(w);
-          w.expressions.forEach(ensureExprSrs);
-          return w;
-        }) : [];
-        state.lastSyncedAt = serverTime;
-        ensureValidDeckState();
-        saveLocal();
-        rerenderAfterSync();
+        // Server is newer; migrate as needed and replace local
+        const migrated = migrateData(data.data || {});
+        if (migrated) {
+          applyData(migrated);
+          state.lastSyncedAt = serverTime;
+          ensureValidDeckState();
+          saveLocal();
+          rerenderAfterSync();
+          // If it was old format we just migrated, push v3 back up
+          if (data.data && data.data.version !== 3) {
+            queuePush();
+          }
+        }
       }
       setSyncStatus('synced');
     } catch (e) {
@@ -1382,6 +1480,7 @@
         .upsert({
           user_id: currentUser.id,
           data: {
+            version: 3,
             decks: state.decks,
             currentDeckId: state.currentDeckId,
             words: state.words
@@ -1402,9 +1501,7 @@
   function queuePush() {
     clearTimeout(pushTimer);
     setSyncStatus('syncing');
-    pushTimer = setTimeout(() => {
-      syncPush();
-    }, 1500);
+    pushTimer = setTimeout(() => syncPush(), 1500);
   }
 
   function rerenderAfterSync() {
@@ -1415,30 +1512,21 @@
   }
 
   // ===== Auth =====
-  async function showAuthOverlay() {
+  function showAuthOverlay() {
     $('#authOverlay').style.display = 'flex';
     $('#authError').textContent = '';
     $('#authEmail').value = '';
     $('#authPassword').value = '';
   }
-
-  function hideAuthOverlay() {
-    $('#authOverlay').style.display = 'none';
-  }
+  function hideAuthOverlay() { $('#authOverlay').style.display = 'none'; }
 
   async function handleSignin() {
     const email = $('#authEmail').value.trim();
     const password = $('#authPassword').value;
-    if (!email || !password) {
-      $('#authError').textContent = '이메일과 비밀번호를 입력해줘';
-      return;
-    }
+    if (!email || !password) { $('#authError').textContent = '이메일과 비밀번호를 입력해줘'; return; }
     $('#authError').textContent = '';
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) {
-      $('#authError').textContent = '로그인 실패: ' + error.message;
-      return;
-    }
+    if (error) { $('#authError').textContent = '로그인 실패: ' + error.message; return; }
     currentUser = data.user;
     hideAuthOverlay();
     await onAuthenticated();
@@ -1447,20 +1535,11 @@
   async function handleSignup() {
     const email = $('#authEmail').value.trim();
     const password = $('#authPassword').value;
-    if (!email || !password) {
-      $('#authError').textContent = '이메일과 비밀번호를 입력해줘';
-      return;
-    }
-    if (password.length < 6) {
-      $('#authError').textContent = '비밀번호는 6자 이상';
-      return;
-    }
+    if (!email || !password) { $('#authError').textContent = '이메일과 비밀번호를 입력해줘'; return; }
+    if (password.length < 6) { $('#authError').textContent = '비밀번호는 6자 이상'; return; }
     $('#authError').textContent = '';
     const { data, error } = await sb.auth.signUp({ email, password });
-    if (error) {
-      $('#authError').textContent = '회원가입 실패: ' + error.message;
-      return;
-    }
+    if (error) { $('#authError').textContent = '회원가입 실패: ' + error.message; return; }
     if (data.session) {
       currentUser = data.user;
       hideAuthOverlay();
@@ -1472,7 +1551,6 @@
 
   async function handleLogout() {
     if (!confirm('로그아웃할까? 로컬 데이터는 남아있어.')) return;
-    // Push final state before logout
     clearTimeout(pushTimer);
     await syncPush(true);
     await sb.auth.signOut();
@@ -1482,29 +1560,8 @@
   }
 
   async function onAuthenticated() {
-    // Pull from cloud first; if cloud is empty, our local data will be pushed up
     await syncPull();
     rerenderAfterSync();
-  }
-
-  function updateMeta() {
-    const all = state.words.length;
-    const inCurr = wordsInDeck(state.currentDeckId).length;
-    $('#countList').textContent = inCurr;
-
-    const deck = getCurrentDeck();
-    if (all === 0) {
-      $('#meta').textContent = '시작해보자';
-    } else if (state.decks.length === 1) {
-      $('#meta').textContent = `${all}개 단어`;
-    } else {
-      $('#meta').textContent = `전체 ${all}개 · ${state.decks.length}개 단어장`;
-    }
-
-    const ctx = $('#addContext');
-    if (deck) {
-      ctx.innerHTML = `현재 단어장: <strong>${escapeHtml(deck.name)}</strong>`;
-    }
   }
 
   // ===== Tabs =====
@@ -1527,17 +1584,12 @@
         <span class="deck-count">${n}</span>
       </button>`;
     }).join('');
-
     bar.innerHTML = pills + `<button class="deck-pill add" id="btnNewDeck">+ 새 단어장</button>`;
-
     bar.querySelectorAll('[data-deck]').forEach(b => {
       b.addEventListener('click', () => {
         const id = b.dataset.deck;
-        if (id === state.currentDeckId) {
-          openDeckMenu(id, b);
-        } else {
-          switchDeck(id);
-        }
+        if (id === state.currentDeckId) openDeckMenu(id, b);
+        else switchDeck(id);
       });
     });
     $('#btnNewDeck').addEventListener('click', createDeck);
@@ -1550,17 +1602,13 @@
     renderList();
     updateMeta();
   }
-
   function createDeck() {
     const name = prompt('새 단어장 이름');
     if (name === null) return;
-    const trimmed = name.trim();
-    if (!trimmed) { toast('이름을 입력해줘'); return; }
-    if (state.decks.some(d => d.name === trimmed)) {
-      toast('같은 이름의 단어장이 있어');
-      return;
-    }
-    const deck = { id: 'd_' + uid(), name: trimmed, created: Date.now() };
+    const t = name.trim();
+    if (!t) { toast('이름을 입력해줘'); return; }
+    if (state.decks.some(d => d.name === t)) { toast('같은 이름의 단어장이 있어'); return; }
+    const deck = { id: 'd_' + uid(), name: t, created: Date.now() };
     state.decks.push(deck);
     state.currentDeckId = deck.id;
     save();
@@ -1569,30 +1617,22 @@
     updateMeta();
     toast('단어장 생성됨');
   }
-
   function renameDeck(deckId) {
     const deck = state.decks.find(d => d.id === deckId);
     if (!deck) return;
     const name = prompt('새 이름', deck.name);
     if (name === null) return;
-    const trimmed = name.trim();
-    if (!trimmed) { toast('이름을 입력해줘'); return; }
-    if (state.decks.some(d => d.id !== deckId && d.name === trimmed)) {
-      toast('같은 이름의 단어장이 있어');
-      return;
-    }
-    deck.name = trimmed;
+    const t = name.trim();
+    if (!t) { toast('이름을 입력해줘'); return; }
+    if (state.decks.some(d => d.id !== deckId && d.name === t)) { toast('같은 이름의 단어장이 있어'); return; }
+    deck.name = t;
     save();
     renderDeckBar();
     updateMeta();
     toast('이름 변경됨');
   }
-
   function deleteDeck(deckId) {
-    if (state.decks.length <= 1) {
-      toast('마지막 단어장은 삭제할 수 없어');
-      return;
-    }
+    if (state.decks.length <= 1) { toast('마지막 단어장은 삭제할 수 없어'); return; }
     const deck = state.decks.find(d => d.id === deckId);
     if (!deck) return;
     const n = wordsInDeck(deckId).length;
@@ -1600,13 +1640,10 @@
       ? `"${deck.name}" 단어장과 그 안의 ${n}개 단어를 삭제할까? (되돌릴 수 없음)`
       : `"${deck.name}" 단어장을 삭제할까?`;
     if (!confirm(msg)) return;
-
     state.decks = state.decks.filter(d => d.id !== deckId);
     state.words = state.words.filter(w => w.deckId !== deckId);
     quizSelectedDecks.delete(deckId);
-    if (state.currentDeckId === deckId) {
-      state.currentDeckId = state.decks[0].id;
-    }
+    if (state.currentDeckId === deckId) state.currentDeckId = state.decks[0].id;
     save();
     renderDeckBar();
     renderList();
@@ -1618,7 +1655,7 @@
   function openDeckMenu(deckId, anchor) {
     closeDeckMenu();
     const deck = state.decks.find(d => d.id === deckId);
-    const currentLang = (deck && deck.lang) || 'en-US';
+    const currentLang = (deck && deck.lang) || 'es-ES';
     const menu = document.createElement('div');
     menu.className = 'deck-menu';
     const canDelete = state.decks.length > 1;
@@ -1629,20 +1666,13 @@
     `;
     document.body.appendChild(menu);
     openMenu = menu;
-
     const rect = anchor.getBoundingClientRect();
-    let top = rect.bottom + 4;
-    let left = rect.left;
-    const menuRect = menu.getBoundingClientRect();
-    if (left + menuRect.width > window.innerWidth - 8) {
-      left = window.innerWidth - menuRect.width - 8;
-    }
-    if (top + menuRect.height > window.innerHeight - 8) {
-      top = rect.top - menuRect.height - 4;
-    }
+    let top = rect.bottom + 4, left = rect.left;
+    const mr = menu.getBoundingClientRect();
+    if (left + mr.width > window.innerWidth - 8) left = window.innerWidth - mr.width - 8;
+    if (top + mr.height > window.innerHeight - 8) top = rect.top - mr.height - 4;
     menu.style.top = top + 'px';
     menu.style.left = left + 'px';
-
     menu.querySelectorAll('button').forEach(b => {
       b.addEventListener('click', e => {
         e.stopPropagation();
@@ -1653,122 +1683,103 @@
         else if (action === 'lang') setDeckLang(deckId);
       });
     });
-
-    setTimeout(() => {
-      document.addEventListener('click', closeDeckMenu, { once: true });
-    }, 0);
+    setTimeout(() => document.addEventListener('click', closeDeckMenu, { once: true }), 0);
   }
+  function closeDeckMenu() { if (openMenu) { openMenu.remove(); openMenu = null; } }
 
   function setDeckLang(deckId) {
     const deck = state.decks.find(d => d.id === deckId);
     if (!deck) return;
-    const current = deck.lang || 'en-US';
+    const current = deck.lang || 'es-ES';
     const lang = prompt(
-      '발음 언어 코드 (예: en-US 영어, es-ES 스페인어, ja-JP 일본어, fr-FR 프랑스어, de-DE 독일어, zh-CN 중국어, ko-KR 한국어)',
+      '발음 언어 코드 (예: es-ES 스페인어, en-US 영어, ja-JP 일본어, fr-FR, de-DE, zh-CN, ko-KR)',
       current
     );
     if (lang === null) return;
-    const trimmed = lang.trim();
-    if (!trimmed) { toast('언어 코드를 입력해줘'); return; }
-    deck.lang = trimmed;
+    const t = lang.trim();
+    if (!t) { toast('언어 코드를 입력해줘'); return; }
+    deck.lang = t;
     save();
     renderDeckBar();
-    toast('언어 설정됨: ' + trimmed);
-  }
-  function closeDeckMenu() {
-    if (openMenu) { openMenu.remove(); openMenu = null; }
+    toast('언어 설정됨: ' + t);
   }
 
-  // ===== Add panel: expression rows =====
-  // Each row is created dynamically; we read values from DOM at submit time.
-  function addExprRow(initial) {
-    const list = $('#exprList');
+  function getDeckLang(deckId) {
+    const d = state.decks.find(x => x.id === deckId);
+    return (d && d.lang) || 'es-ES';
+  }
+
+  // ===== Speech =====
+  function speak(text, lang) {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang || 'es-ES';
+    speechSynthesis.speak(u);
+  }
+
+  // ===== Examples (form rows) =====
+  function addExampleRow(container, initial) {
     const row = document.createElement('div');
-    row.className = 'expr-row';
+    row.className = 'example-row';
     row.innerHTML = `
-      <button class="expr-remove" type="button" title="삭제">×</button>
+      <button class="example-remove" type="button" title="삭제">×</button>
       <div class="field">
-        <label>표현 (phrase)</label>
-        <input type="text" data-expr="phrase" placeholder="예: levantar la cabeza" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>뜻</label>
-        <input type="text" data-expr="meaning" placeholder="예: 고개를 들다" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>예문 (선택)</label>
-        <textarea data-expr="example" placeholder="예: Levanta la cabeza y respira profundo."></textarea>
+        <label>예문</label>
+        <textarea data-ex="text" placeholder="예: Levanta la cabeza y respira profundo."></textarea>
       </div>
       <div class="field">
         <label>예문 뜻 (선택)</label>
-        <input type="text" data-expr="exampleMeaning" placeholder="예: 고개를 들고 깊게 숨 쉬어" autocomplete="off">
+        <input type="text" data-ex="meaning" placeholder="예: 고개를 들고 깊게 숨 쉬어" autocomplete="off">
       </div>
     `;
     if (initial) {
-      row.querySelector('[data-expr="phrase"]').value = initial.phrase || '';
-      row.querySelector('[data-expr="meaning"]').value = initial.meaning || '';
-      row.querySelector('[data-expr="example"]').value = initial.example || '';
-      row.querySelector('[data-expr="exampleMeaning"]').value = initial.exampleMeaning || '';
+      row.querySelector('[data-ex="text"]').value = initial.text || '';
+      row.querySelector('[data-ex="meaning"]').value = initial.meaning || '';
     }
-    row.querySelector('.expr-remove').addEventListener('click', () => {
-      row.remove();
-    });
-    list.appendChild(row);
+    row.querySelector('.example-remove').addEventListener('click', () => row.remove());
+    container.appendChild(row);
     return row;
   }
 
-  function readExprRowsFrom(container) {
-    const rows = container.querySelectorAll('.expr-row');
+  function readExampleRowsFrom(container) {
+    const rows = container.querySelectorAll('.example-row');
     const result = [];
     rows.forEach(r => {
-      const phrase = r.querySelector('[data-expr="phrase"]').value.trim();
-      const meaning = r.querySelector('[data-expr="meaning"]').value.trim();
-      const example = r.querySelector('[data-expr="example"]').value.trim();
-      const exampleMeaning = r.querySelector('[data-expr="exampleMeaning"]').value.trim();
-      if (phrase && meaning) {
-        const e = {
-          id: uid(),
-          phrase, meaning, example, exampleMeaning,
-          correct: 0, wrong: 0
-        };
-        ensureExprSrs(e);
-        result.push(e);
-      }
+      const text = r.querySelector('[data-ex="text"]').value.trim();
+      const meaning = r.querySelector('[data-ex="meaning"]').value.trim();
+      if (text) result.push({ id: uid(), text, meaning });
     });
     return result;
   }
 
+  // ===== Add =====
   function clearAddForm() {
     $('#inputTerm').value = '';
     $('#inputMeaning').value = '';
-    $('#exprList').innerHTML = '';
+    $('#exampleList').innerHTML = '';
     $('#inputTerm').focus();
   }
-
-  $('#btnAddExpr').addEventListener('click', () => addExprRow());
+  $('#btnAddExample').addEventListener('click', () => addExampleRow($('#exampleList')));
 
   function addWord() {
     const term = $('#inputTerm').value.trim();
     const meaning = $('#inputMeaning').value.trim();
-    if (!term || !meaning) {
-      toast('단어와 뜻을 입력해줘');
-      return;
-    }
-    const expressions = readExprRowsFrom($('#exprList'));
+    if (!term || !meaning) { toast('단어와 뜻을 입력해줘'); return; }
+    const examples = readExampleRowsFrom($('#exampleList'));
     const w = {
       id: uid(),
       deckId: state.currentDeckId,
       term, meaning,
-      expressions,
+      examples,
       created: Date.now(),
-      correct: 0,
-      wrong: 0
+      correct: 0, wrong: 0
     };
-    ensureWordSrs(w);
+    ensureWord(w);
     state.words.unshift(w);
     save();
     clearAddForm();
-    toast(expressions.length > 0 ? `추가됨 (표현 ${expressions.length}개)` : '추가됨');
+    toast(examples.length > 0 ? `추가됨 (예문 ${examples.length}개)` : '추가됨');
     renderDeckBar();
   }
   $('#btnAdd').addEventListener('click', addWord);
@@ -1777,9 +1788,20 @@
   $('#inputTerm').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); $('#inputMeaning').focus(); }
   });
-  $('#inputMeaning').addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); /* don't auto-add — user might want expressions */ }
-  });
+
+  // ===== Meta =====
+  function updateMeta() {
+    const all = state.words.length;
+    const inCurr = wordsInDeck(state.currentDeckId).length;
+    $('#countList').textContent = inCurr;
+    if (all === 0) $('#meta').textContent = '시작해보자';
+    else if (state.decks.length === 1) $('#meta').textContent = `${all} palabras`;
+    else $('#meta').textContent = `전체 ${all} · ${state.decks.length}개 단어장`;
+
+    const ctx = $('#addContext');
+    const deck = getCurrentDeck();
+    if (deck) ctx.innerHTML = `현재 단어장: <strong>${escapeHtml(deck.name)}</strong>`;
+  }
 
   // ===== List =====
   function renderList() {
@@ -1790,11 +1812,8 @@
       if (!q) return true;
       if (w.term.toLowerCase().includes(q)) return true;
       if (w.meaning.toLowerCase().includes(q)) return true;
-      const exps = w.expressions || [];
-      return exps.some(e =>
-        e.phrase.toLowerCase().includes(q) ||
-        e.meaning.toLowerCase().includes(q) ||
-        (e.example && e.example.toLowerCase().includes(q))
+      return (w.examples || []).some(e =>
+        e.text.toLowerCase().includes(q) || (e.meaning && e.meaning.toLowerCase().includes(q))
       );
     });
 
@@ -1803,28 +1822,22 @@
       const msg = inDeck.length === 0
         ? `"${deck ? deck.name : ''}" 단어장이 비어있어`
         : '검색 결과 없음';
-      list.innerHTML = `<div class="empty">${escapeHtml(msg)}</div>`;
+      list.innerHTML = `<div class="empty"><span class="ornament">· · ·</span>${escapeHtml(msg)}</div>`;
       return;
     }
 
     list.innerHTML = filtered.map(w => {
-      const exps = w.expressions || [];
+      const exs = w.examples || [];
       const deckLang = getDeckLang(w.deckId);
-      const exprsHtml = exps.length > 0 ? `
-        <div class="word-expressions">
-          ${exps.map(e => `
-            <div class="word-expr">
-              <div class="word-expr-head">
-                <span class="word-expr-phrase">${escapeHtml(e.phrase)}<button class="speak-btn-tiny" data-speak="${escapeAttr(e.phrase)}" data-lang="${escapeAttr(deckLang)}" title="발음">♪</button></span>
-                <span class="word-expr-meaning">${escapeHtml(e.meaning)}</span>
-                <span class="word-expr-stats">${e.correct || 0}·${e.wrong || 0}</span>
-              </div>
-              ${e.example ? `<div class="word-expr-example">${escapeHtml(e.example)}<button class="speak-btn-tiny" data-speak="${escapeAttr(e.example)}" data-lang="${escapeAttr(deckLang)}" title="발음">♪</button></div>` : ''}
-              ${e.exampleMeaning ? `<div class="word-expr-example-meaning">${escapeHtml(e.exampleMeaning)}</div>` : ''}
+      const exsHtml = exs.length > 0 ? `
+        <div class="word-examples">
+          ${exs.map(e => `
+            <div class="word-example">
+              <div class="word-example-text">${escapeHtml(e.text)}<button class="speak-btn-tiny" data-speak="${escapeAttr(e.text)}" data-lang="${escapeAttr(deckLang)}" title="발음">♪</button></div>
+              ${e.meaning ? `<div class="word-example-meaning">${escapeHtml(e.meaning)}</div>` : ''}
             </div>
           `).join('')}
-        </div>
-      ` : '';
+        </div>` : '';
       return `
         <li class="word-item" data-id="${w.id}">
           <div class="word-head">
@@ -1838,19 +1851,15 @@
               <button class="danger" data-del="${w.id}" title="삭제">×</button>
             </div>
           </div>
-          ${exprsHtml}
-        </li>
-      `;
+          ${exsHtml}
+        </li>`;
     }).join('');
 
     list.querySelectorAll('[data-del]').forEach(b => {
       b.addEventListener('click', () => {
         const id = b.dataset.del;
-        const w = state.words.find(x => x.id === id);
-        const n = (w && w.expressions) ? w.expressions.length : 0;
-        const msg = n > 0 ? `이 단어와 그 안의 표현 ${n}개를 삭제할까?` : '삭제할까?';
-        if (confirm(msg)) {
-          state.words = state.words.filter(x => x.id !== id);
+        if (confirm('삭제할까?')) {
+          state.words = state.words.filter(w => w.id !== id);
           save();
           renderList();
           renderDeckBar();
@@ -1874,42 +1883,39 @@
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-      <div class="modal" id="modalContent">
+      <div class="modal">
         <h3>단어 편집</h3>
         <div class="field">
-          <label>단어 / Term</label>
+          <label>단어 / Palabra</label>
           <input type="text" id="editTerm" autocomplete="off">
         </div>
         <div class="field">
-          <label>뜻 / Meaning</label>
+          <label>뜻</label>
           <input type="text" id="editMeaning" autocomplete="off">
         </div>
         <div class="section-divider">
-          <span class="title">표현 (Expressions)</span>
-          <span class="hint">단어가 사용되는 표현들</span>
+          <span class="title">예문 (Ejemplos)</span>
+          <span class="ornament">· · ·</span>
+          <span class="hint">선택</span>
         </div>
-        <div id="editExprList"></div>
-        <button class="expr-add-btn" id="editAddExpr" type="button">+ 표현 추가</button>
+        <div id="editExampleList"></div>
+        <button class="add-row-btn" id="editAddExample" type="button">+ 예문 추가</button>
         <div class="btn-row" style="margin-top:8px;">
           <button class="btn" id="editSave">저장</button>
           <button class="btn btn-ghost" id="editCancel">취소</button>
         </div>
-      </div>
-    `;
+      </div>`;
     document.body.appendChild(overlay);
-    $('#editModal').replaceWith(overlay);
+    const oldEditModal = $('#editModal');
+    if (oldEditModal) oldEditModal.replaceWith(overlay);
     overlay.id = 'editModal';
 
     overlay.querySelector('#editTerm').value = w.term;
     overlay.querySelector('#editMeaning').value = w.meaning;
-    const editList = overlay.querySelector('#editExprList');
-    (w.expressions || []).forEach(e => {
-      addExprRowTo(editList, e);
-    });
+    const editList = overlay.querySelector('#editExampleList');
+    (w.examples || []).forEach(e => addExampleRow(editList, e));
 
-    overlay.querySelector('#editAddExpr').addEventListener('click', () => {
-      addExprRowTo(editList);
-    });
+    overlay.querySelector('#editAddExample').addEventListener('click', () => addExampleRow(editList));
     overlay.querySelector('#editCancel').addEventListener('click', () => {
       overlay.remove();
       const placeholder = document.createElement('div');
@@ -1924,27 +1930,17 @@
     overlay.querySelector('#editSave').addEventListener('click', () => {
       const term = overlay.querySelector('#editTerm').value.trim();
       const meaning = overlay.querySelector('#editMeaning').value.trim();
-      if (!term || !meaning) {
-        toast('단어와 뜻을 입력해줘');
-        return;
-      }
-      const newExpressions = readExprRowsFrom(editList);
-      // Preserve existing expression IDs, stats, and SRS where phrase matches
-      const oldByPhrase = {};
-      (w.expressions || []).forEach(e => { oldByPhrase[e.phrase] = e; });
-      newExpressions.forEach(ne => {
-        const old = oldByPhrase[ne.phrase];
-        if (old) {
-          ne.id = old.id;
-          ne.correct = old.correct || 0;
-          ne.wrong = old.wrong || 0;
-          if (old.srs) ne.srs = old.srs;
-          if (old.srsBlank) ne.srsBlank = old.srsBlank;
-        }
+      if (!term || !meaning) { toast('단어와 뜻을 입력해줘'); return; }
+      const newExamples = readExampleRowsFrom(editList);
+      // Preserve example IDs by text match (so we don't unnecessarily change ID on edit)
+      const oldByText = {};
+      (w.examples || []).forEach(e => { oldByText[e.text] = e; });
+      newExamples.forEach(ne => {
+        if (oldByText[ne.text]) ne.id = oldByText[ne.text].id;
       });
       w.term = term;
       w.meaning = meaning;
-      w.expressions = newExpressions;
+      w.examples = newExamples;
       save();
       overlay.querySelector('#editCancel').click();
       renderList();
@@ -1953,219 +1949,63 @@
     });
   }
 
-  function addExprRowTo(container, initial) {
-    const row = document.createElement('div');
-    row.className = 'expr-row';
-    row.innerHTML = `
-      <button class="expr-remove" type="button" title="삭제">×</button>
-      <div class="field">
-        <label>표현 (phrase)</label>
-        <input type="text" data-expr="phrase" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>뜻</label>
-        <input type="text" data-expr="meaning" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>예문 (선택)</label>
-        <textarea data-expr="example"></textarea>
-      </div>
-      <div class="field">
-        <label>예문 뜻 (선택)</label>
-        <input type="text" data-expr="exampleMeaning" autocomplete="off">
-      </div>
-    `;
-    if (initial) {
-      row.querySelector('[data-expr="phrase"]').value = initial.phrase || '';
-      row.querySelector('[data-expr="meaning"]').value = initial.meaning || '';
-      row.querySelector('[data-expr="example"]').value = initial.example || '';
-      row.querySelector('[data-expr="exampleMeaning"]').value = initial.exampleMeaning || '';
-    }
-    row.querySelector('.expr-remove').addEventListener('click', () => row.remove());
-    container.appendChild(row);
-  }
-
-  // ===== Speech =====
-  function speak(text, lang) {
-    if (!('speechSynthesis' in window)) return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang || 'en-US';
-    speechSynthesis.speak(u);
-  }
-
-  function getDeckLang(deckId) {
-    const d = state.decks.find(x => x.id === deckId);
-    return (d && d.lang) || 'en-US';
-  }
-
-  // ===== SRS (Spaced Repetition) =====
-  const DAY_MS = 86400000;
-
-  function defaultSrs() {
-    return {
-      due: 0,        // 0 means "new card, due immediately"
-      interval: 0,   // days; 0 means new/learning
-      ease: 2.5,     // multiplier
-      reps: 0,       // successful reps (Good/Easy without prior Again)
-      lapses: 0      // times forgotten
-    };
-  }
-
-  function ensureSrs(obj, key) {
-    if (!obj[key] || typeof obj[key].due !== 'number') {
-      obj[key] = defaultSrs();
-    }
-  }
-
-  function ensureWordSrs(w) { ensureSrs(w, 'srs'); }
-  function ensureExprSrs(e) {
-    ensureSrs(e, 'srs');
-    ensureSrs(e, 'srsBlank');
-  }
-
-  // Compute new SRS state from a rating ('again' | 'hard' | 'good' | 'easy')
-  function updateSrs(srs, rating) {
-    const now = Date.now();
-    let { interval, ease, reps, lapses } = srs;
-    let dueMs;
-    const isNew = reps === 0;
-
-    if (rating === 'again') {
-      if (reps > 0) lapses += 1;
-      interval = 0;
-      reps = 0;
-      ease = Math.max(1.3, ease - 0.2);
-      dueMs = now + 60000; // 1 min
-    } else if (rating === 'hard') {
-      if (isNew) {
-        interval = 0;
-        dueMs = now + 6 * 60000; // 6 min
-      } else {
-        interval = Math.max(Math.round(interval * 1.2), interval + 1);
-        dueMs = now + interval * DAY_MS;
-        reps += 1;
-      }
-      ease = Math.max(1.3, ease - 0.15);
-    } else if (rating === 'good') {
-      if (isNew) {
-        interval = 1;
-        reps = 1;
-      } else {
-        interval = Math.max(1, Math.round(interval * ease));
-        reps += 1;
-      }
-      dueMs = now + interval * DAY_MS;
-    } else if (rating === 'easy') {
-      if (isNew) {
-        interval = 4;
-        reps = 1;
-      } else {
-        interval = Math.max(1, Math.round(interval * ease * 1.3));
-        reps += 1;
-      }
-      ease = Math.min(3.0, ease + 0.15);
-      dueMs = now + interval * DAY_MS;
-    }
-    return { due: dueMs, interval, ease, reps, lapses };
-  }
-
-  function formatTime(ms) {
-    if (ms < 0) ms = 0;
-    const min = ms / 60000;
-    if (min < 60) return Math.max(1, Math.round(min)) + '분';
-    const hr = ms / 3600000;
-    if (hr < 24) return Math.round(hr) + '시간';
-    const day = ms / 86400000;
-    if (day < 30) return Math.round(day) + '일';
-    if (day < 365) return Math.round(day / 30) + '달';
-    return (day / 365).toFixed(1) + '년';
-  }
-
-  function previewInterval(srs, rating) {
-    const ns = updateSrs(srs, rating);
-    return formatTime(ns.due - Date.now());
-  }
-
-  function getCardSrs(card) {
-    if (card.kind === 'head') return card.word.srs;
-    if (card.kind === 'expr') return card.expr.srs;
-    if (card.kind === 'blank') return card.expr.srsBlank;
-  }
-
-  function setCardSrs(card, ns) {
-    if (card.kind === 'head') card.word.srs = ns;
-    else if (card.kind === 'expr') card.expr.srs = ns;
-    else if (card.kind === 'blank') card.expr.srsBlank = ns;
-  }
-
   // ===== Blank helpers =====
-  // Find headword in a sentence. Word boundary for ASCII, plain match for non-ASCII.
-  // Also tries the headword without leading articles (la/el/the/a/an/un/una/los/las).
+  // Find term inside text. Tries the term as-is, then with leading articles stripped,
+  // then the LAST word of the term (handles verb phrases like "levantar la cabeza" → match "cabeza").
   function findTermInText(term, text) {
     if (!term || !text) return null;
-    const candidates = [term];
-    // Strip common articles
-    const stripped = term.replace(/^(la|el|los|las|un|una|unos|unas|the|a|an)\s+/i, '');
-    if (stripped !== term && stripped.length > 0) candidates.push(stripped);
+    const t = term.trim();
+    const candidates = [t];
+    const stripped = t.replace(/^(la|el|los|las|un|una|unos|unas|the|a|an)\s+/i, '');
+    if (stripped !== t && stripped.length > 0) candidates.push(stripped);
+    // Last word fallback
+    const parts = stripped.split(/\s+/);
+    if (parts.length > 1) {
+      const last = parts[parts.length - 1];
+      if (last && last.length > 1) candidates.push(last);
+    }
 
     for (const c of candidates) {
       const isAscii = /^[A-Za-zÀ-ÿ\s'\-]+$/.test(c);
-      let m;
+      let m = null;
       if (isAscii) {
         const re = new RegExp(`\\b${escapeRegex(c)}\\b`, 'i');
-        m = text.match(re);
+        const found = text.match(re);
+        if (found) m = { index: found.index, length: found[0].length, matched: found[0] };
       } else {
         const idx = text.toLowerCase().indexOf(c.toLowerCase());
-        m = idx === -1 ? null : { index: idx, 0: text.substr(idx, c.length) };
+        if (idx !== -1) m = { index: idx, length: c.length, matched: text.substr(idx, c.length) };
       }
-      if (m) {
-        const matched = m[0];
-        return { index: m.index, length: matched.length, matched };
-      }
+      if (m) return m;
     }
     return null;
   }
 
+  function hasBlankExample(w) {
+    return (w.examples || []).some(e => findTermInText(w.term, e.text));
+  }
+
   // ===== Quiz card building =====
-  // Cards have shape:
-  //   { kind: 'head', word, dir }
-  //   { kind: 'expr', word, expr, dir }
-  //   { kind: 'blank', word, expr, match: {index,length,matched} }
+  // Card shapes:
+  //   { kind: 'term',  word, dir: 't2m'|'m2t' }
+  //   { kind: 'blank', word, example, match: {index,length,matched} }
   function buildCards(words, mode) {
     const cards = [];
     for (const w of words) {
-      const exps = w.expressions || [];
+      const exs = w.examples || [];
       if (mode === 'blank') {
-        // Only blank cards from expressions whose example contains the headword
-        for (const e of exps) {
-          if (!e.example) continue;
-          const m = findTermInText(w.term, e.example);
-          if (m) cards.push({ kind: 'blank', word: w, expr: e, match: m });
+        for (const ex of exs) {
+          const m = findTermInText(w.term, ex.text);
+          if (m) cards.push({ kind: 'blank', word: w, example: ex, match: m });
         }
       } else if (mode === 't2m' || mode === 'm2t') {
-        // Headword card + each expression card
-        cards.push({ kind: 'head', word: w, dir: mode });
-        for (const e of exps) {
-          cards.push({ kind: 'expr', word: w, expr: e, dir: mode });
-        }
+        cards.push({ kind: 'term', word: w, dir: mode });
       } else if (mode === 'mix') {
-        // Head card with random direction
-        cards.push({ kind: 'head', word: w, dir: Math.random() < 0.5 ? 't2m' : 'm2t' });
-        for (const e of exps) {
-          // Decide: t2m, m2t, or blank if eligible
-          const opts = ['t2m', 'm2t'];
-          let blankMatch = null;
-          if (e.example) {
-            blankMatch = findTermInText(w.term, e.example);
-            if (blankMatch) opts.push('blank');
-          }
-          const pick = opts[Math.floor(Math.random() * opts.length)];
-          if (pick === 'blank') {
-            cards.push({ kind: 'blank', word: w, expr: e, match: blankMatch });
-          } else {
-            cards.push({ kind: 'expr', word: w, expr: e, dir: pick });
-          }
+        const dir = Math.random() < 0.5 ? 't2m' : 'm2t';
+        cards.push({ kind: 'term', word: w, dir });
+        for (const ex of exs) {
+          const m = findTermInText(w.term, ex.text);
+          if (m) cards.push({ kind: 'blank', word: w, example: ex, match: m });
         }
       }
     }
@@ -2217,41 +2057,28 @@
     $('#quizSetup').style.display = 'block';
     $('#quizCard').style.display = 'none';
     $('#quizResult').style.display = 'none';
-
     const validIds = new Set(state.decks.map(d => d.id));
     quizSelectedDecks = new Set([...quizSelectedDecks].filter(id => validIds.has(id)));
-    if (quizSelectedDecks.size === 0) {
-      quizSelectedDecks.add(state.currentDeckId);
-    }
+    if (quizSelectedDecks.size === 0) quizSelectedDecks.add(state.currentDeckId);
     renderQuizDeckSelector();
   }
 
   $('#btnStartQuiz').addEventListener('click', () => {
-    if (quizSelectedDecks.size === 0) {
-      toast('단어장을 하나 이상 선택해줘');
-      return;
-    }
+    if (quizSelectedDecks.size === 0) { toast('단어장을 하나 이상 선택해줘'); return; }
     const wordsPool = state.words.filter(w => quizSelectedDecks.has(w.deckId));
-    if (wordsPool.length === 0) {
-      toast('선택한 단어장에 단어가 없어');
-      return;
-    }
+    if (wordsPool.length === 0) { toast('선택한 단어장에 단어가 없어'); return; }
 
     let cards = buildCards(wordsPool, quizDir);
     if (cards.length === 0) {
-      if (quizDir === 'blank') {
-        toast('예문 안에 헤드워드가 들어간 표현이 없어');
-      } else {
-        toast('출제할 카드가 없어');
-      }
+      if (quizDir === 'blank') toast('예문 안에 단어가 들어간 게 없어');
+      else toast('출제할 카드가 없어');
       return;
     }
 
-    // Prioritize by SRS due date: most overdue first, with small jitter
+    // SRS priority sort
     const now = Date.now();
     cards.forEach(c => {
       const srs = getCardSrs(c) || defaultSrs();
-      // Higher score = higher priority. Overdue cards get high scores.
       c._priority = (now - srs.due) / DAY_MS + Math.random() * 0.3;
     });
     cards.sort((a, b) => b._priority - a._priority);
@@ -2259,13 +2086,7 @@
     const total = quizN === 'all' ? cards.length : Math.min(quizN, cards.length);
     cards = cards.slice(0, total);
 
-    state.quiz = {
-      cards,
-      idx: 0,
-      correct: 0,
-      missed: []
-    };
-
+    state.quiz = { cards, idx: 0, correct: 0, missed: [] };
     $('#quizSetup').style.display = 'none';
     $('#quizCard').style.display = 'block';
     $('#quizResult').style.display = 'none';
@@ -2273,8 +2094,7 @@
   });
 
   function kindLabel(card) {
-    if (card.kind === 'head') return '단어';
-    if (card.kind === 'expr') return '표현';
+    if (card.kind === 'term') return '단어';
     if (card.kind === 'blank') return '빈칸';
     return '';
   }
@@ -2286,62 +2106,34 @@
 
     const qEl = $('#quizQuestion');
     const hintEl = $('#quizHint');
-    const ctxEl = $('#quizContext');
-    const aEl = $('#quizAnswer');
-
-    qEl.classList.remove('is-sentence', 'is-phrase');
-    aEl.style.display = 'none';
-    ctxEl.textContent = '';
+    qEl.classList.remove('is-sentence');
+    $('#quizAnswer').style.display = 'none';
 
     if (card.kind === 'blank') {
-      // Show example with headword blanked. Context: optionally show expr's meaning.
       const w = card.word;
-      const e = card.expr;
+      const ex = card.example;
       const m = card.match;
-      const before = e.example.slice(0, m.index);
-      const after = e.example.slice(m.index + m.length);
+      const before = ex.text.slice(0, m.index);
+      const after = ex.text.slice(m.index + m.length);
       qEl.classList.add('is-sentence');
       qEl.innerHTML = escapeHtml(before)
         + '<span class="blank-mark">' + escapeHtml(m.matched) + '</span>'
         + escapeHtml(after);
-      // Show the expression's meaning as context (helpful hint)
-      ctxEl.textContent = `(표현: ${e.phrase} — ${e.meaning})`;
-      hintEl.textContent = `'${w.term}' 의 변형 또는 동일한 형태를 입력`;
+      hintEl.textContent = `'${w.term}' — ${w.meaning}`;
 
       $('#quizControls').innerHTML = `
         <div class="quiz-blank-input-row">
           <input type="text" id="blankInput" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="입력...">
           <button class="btn" id="btnCheck">확인</button>
-        </div>
-      `;
+        </div>`;
       const inp = $('#blankInput');
       setTimeout(() => inp.focus(), 50);
       inp.addEventListener('keydown', ev => {
         if (ev.key === 'Enter') { ev.preventDefault(); checkBlank(); }
       });
       $('#btnCheck').addEventListener('click', checkBlank);
-    } else if (card.kind === 'expr') {
-      const e = card.expr;
-      const w = card.word;
-      const deckLang = getDeckLang(w.deckId);
-      const isT2M = card.dir === 't2m';
-      qEl.classList.add('is-phrase');
-      const question = isT2M ? e.phrase : e.meaning;
-      qEl.innerHTML = escapeHtml(question);
-      if (isT2M) {
-        const btn = document.createElement('button');
-        btn.className = 'speak-btn';
-        btn.title = '발음';
-        btn.textContent = '♪';
-        btn.addEventListener('click', () => speak(e.phrase, deckLang));
-        qEl.appendChild(btn);
-      }
-      ctxEl.textContent = `(헤드워드: ${w.term} — ${w.meaning})`;
-      hintEl.textContent = isT2M ? '뜻은?' : '표현은?';
-      $('#quizControls').innerHTML = `<button class="btn" id="btnReveal">정답 보기</button>`;
-      $('#btnReveal').addEventListener('click', revealAnswer);
     } else {
-      // head
+      // term card
       const w = card.word;
       const deckLang = getDeckLang(w.deckId);
       const isT2M = card.dir === 't2m';
@@ -2361,7 +2153,6 @@
     }
   }
 
-  // Render the 4-grade evaluation buttons for the current card.
   function renderGradeButtons() {
     const card = state.quiz.cards[state.quiz.idx];
     const srs = getCardSrs(card) || defaultSrs();
@@ -2372,8 +2163,7 @@
         <button class="btn-grade btn-hard" data-rating="hard">어려움<span class="interval">${previewInterval(srs, 'hard')}</span></button>
         <button class="btn-grade btn-good" data-rating="good">좋음<span class="interval">${previewInterval(srs, 'good')}</span></button>
         <button class="btn-grade btn-easy" data-rating="easy">쉬움<span class="interval">${previewInterval(srs, 'easy')}</span></button>
-      </div>
-    `;
+      </div>`;
     wrap.querySelectorAll('[data-rating]').forEach(b => {
       b.addEventListener('click', () => grade(b.dataset.rating));
     });
@@ -2381,27 +2171,22 @@
 
   function revealAnswer() {
     const card = state.quiz.cards[state.quiz.idx];
-    const deckLang = getDeckLang(card.word.deckId);
-    let answer, sub, speakText = null;
-    if (card.kind === 'head') {
-      answer = card.dir === 't2m' ? card.word.meaning : card.word.term;
-      if (card.dir === 'm2t') speakText = card.word.term;
-    } else if (card.kind === 'expr') {
-      answer = card.dir === 't2m' ? card.expr.meaning : card.expr.phrase;
-      if (card.dir === 'm2t') speakText = card.expr.phrase;
-      if (card.expr.example) {
-        let exHtml = `<button class="speak-btn-tiny" data-speak-ex>♪</button> ` + escapeHtml(card.expr.example);
-        if (card.expr.exampleMeaning) {
-          exHtml += `<br><span style="font-style:normal;font-size:12px;">${escapeHtml(card.expr.exampleMeaning)}</span>`;
-        }
-        sub = exHtml;
-      }
-    }
+    const w = card.word;
+    const deckLang = getDeckLang(w.deckId);
+    const isT2M = card.dir === 't2m';
+    const answer = isT2M ? w.meaning : w.term;
+    let speakText = isT2M ? null : w.term;
 
     const a = $('#quizAnswer');
     let answerHtml = escapeHtml(answer);
-    if (speakText) {
-      answerHtml += ` <button class="speak-btn-tiny" data-speak-answer>♪</button>`;
+    if (speakText) answerHtml += ` <button class="speak-btn-tiny" data-speak-answer>♪</button>`;
+
+    // Show first example (if any) below the answer for context
+    let sub = '';
+    const ex = (w.examples || [])[0];
+    if (ex) {
+      sub = `<button class="speak-btn-tiny" data-speak-ex>♪</button> ${escapeHtml(ex.text)}`;
+      if (ex.meaning) sub += `<br><span style="font-style:normal;font-size:12px;">${escapeHtml(ex.meaning)}</span>`;
     }
     a.innerHTML = answerHtml + (sub ? `<span class="note">${sub}</span>` : '');
     a.style.display = 'block';
@@ -2410,11 +2195,10 @@
       const b = a.querySelector('[data-speak-answer]');
       if (b) b.addEventListener('click', () => speak(speakText, deckLang));
     }
-    if (card.kind === 'expr' && card.expr.example) {
+    if (ex) {
       const b = a.querySelector('[data-speak-ex]');
-      if (b) b.addEventListener('click', () => speak(card.expr.example, deckLang));
+      if (b) b.addEventListener('click', () => speak(ex.text, deckLang));
     }
-
     renderGradeButtons();
   }
 
@@ -2425,49 +2209,43 @@
 
     const card = state.quiz.cards[state.quiz.idx];
     const w = card.word;
-    const e = card.expr;
+    const ex = card.example;
     const m = card.match;
-    const correct = m.matched; // whatever appeared in the sentence
-
     const userL = userAns.toLowerCase();
-    const correctL = correct.toLowerCase();
+    const correctL = m.matched.toLowerCase();
     const termL = w.term.toLowerCase();
-    // Accept either: the exact matched form, the headword as-is, or stripped-article form
-    const acceptable = new Set([correctL, termL, termL.replace(/^(la|el|los|las|un|una|unos|unas|the|a|an)\s+/, '')]);
+    const acceptable = new Set([
+      correctL, termL,
+      termL.replace(/^(la|el|los|las|un|una|unos|unas|the|a|an)\s+/, '')
+    ]);
     const isCorrect = acceptable.has(userL);
 
     const qEl = $('#quizQuestion');
-    const before = e.example.slice(0, m.index);
-    const after = e.example.slice(m.index + m.length);
+    const before = ex.text.slice(0, m.index);
+    const after = ex.text.slice(m.index + m.length);
     const cls = isCorrect ? 'correct' : 'wrong';
     qEl.innerHTML = escapeHtml(before)
       + '<span class="blank-filled ' + cls + '">' + escapeHtml(m.matched) + '</span>'
       + escapeHtml(after);
 
-    // Speak button for the full example (now safe to play, answer revealed)
+    // Speak button for the example
     const speakBtn = document.createElement('button');
     speakBtn.className = 'speak-btn-tiny';
     speakBtn.title = '발음';
     speakBtn.textContent = '♪';
-    speakBtn.addEventListener('click', () => speak(e.example, getDeckLang(w.deckId)));
+    speakBtn.addEventListener('click', () => speak(ex.text, getDeckLang(w.deckId)));
     qEl.appendChild(speakBtn);
 
     const a = $('#quizAnswer');
     let feedback;
-    if (isCorrect) {
-      feedback = `<span class="quiz-feedback correct">✓ 정답</span>`;
-    } else {
-      feedback = `<span class="quiz-feedback wrong"><span class="user-ans">${escapeHtml(userAns)}</span><span class="arrow">→</span><span class="correct-ans">${escapeHtml(m.matched)}</span></span>`;
-    }
-    let exampleMeaningHtml = '';
-    if (e.exampleMeaning) {
-      exampleMeaningHtml = `<span class="note" style="font-style:normal;">${escapeHtml(e.exampleMeaning)}</span>`;
-    }
-    a.innerHTML = feedback + `<span class="note">${escapeHtml(e.phrase)} — ${escapeHtml(e.meaning)}</span>` + exampleMeaningHtml;
+    if (isCorrect) feedback = `<span class="quiz-feedback correct">✓ 정답</span>`;
+    else feedback = `<span class="quiz-feedback wrong"><span class="user-ans">${escapeHtml(userAns)}</span><span class="arrow">→</span><span class="correct-ans">${escapeHtml(m.matched)}</span></span>`;
+    let exMeaningHtml = '';
+    if (ex.meaning) exMeaningHtml = `<span class="note" style="font-style:normal;">${escapeHtml(ex.meaning)}</span>`;
+    a.innerHTML = feedback + `<span class="note">${escapeHtml(w.term)} — ${escapeHtml(w.meaning)}</span>` + exMeaningHtml;
     a.style.display = 'block';
 
     renderGradeButtons();
-    // Hint: pre-focus the suggested rating
     const suggested = isCorrect ? 'good' : 'again';
     setTimeout(() => {
       const btn = $('#quizControls').querySelector(`[data-rating="${suggested}"]`);
@@ -2479,40 +2257,22 @@
     const card = state.quiz.cards[state.quiz.idx];
     const isWrong = rating === 'again';
 
-    // Update SRS state (mutates the live word/expression object)
     const oldSrs = getCardSrs(card) || defaultSrs();
-    const newSrs = updateSrs(oldSrs, rating);
-    setCardSrs(card, newSrs);
+    setCardSrs(card, updateSrs(oldSrs, rating));
 
-    // Update plain stats counters (display)
     const w = state.words.find(x => x.id === card.word.id);
     if (w) {
-      if (card.kind === 'head') {
-        if (isWrong) w.wrong = (w.wrong || 0) + 1;
-        else w.correct = (w.correct || 0) + 1;
-      } else if (w.expressions) {
-        const e = w.expressions.find(x => x.id === card.expr.id);
-        if (e) {
-          if (isWrong) e.wrong = (e.wrong || 0) + 1;
-          else e.correct = (e.correct || 0) + 1;
-        }
-      }
+      if (isWrong) w.wrong = (w.wrong || 0) + 1;
+      else w.correct = (w.correct || 0) + 1;
     }
 
-    if (isWrong) {
-      state.quiz.missed.push(card);
-    } else {
-      state.quiz.correct++;
-    }
+    if (isWrong) state.quiz.missed.push(card);
+    else state.quiz.correct++;
 
     save();
     state.quiz.idx++;
-
-    if (state.quiz.idx >= state.quiz.cards.length) {
-      finishQuiz();
-    } else {
-      showQuestion();
-    }
+    if (state.quiz.idx >= state.quiz.cards.length) finishQuiz();
+    else showQuestion();
   }
 
   function finishQuiz() {
@@ -2522,37 +2282,30 @@
     const total = state.quiz.cards.length;
     const correct = state.quiz.correct;
     const ratio = correct / total;
-
     $('#resCorrect').textContent = correct;
     $('#resTotal').textContent = total;
 
     let label;
-    if (ratio === 1) label = '완벽해';
-    else if (ratio >= 0.8) label = '훌륭해';
-    else if (ratio >= 0.6) label = '나쁘지 않아';
-    else if (ratio >= 0.3) label = '다시 한 번';
-    else label = '천천히, 다시';
+    if (ratio === 1) label = '¡Perfecto! 완벽해';
+    else if (ratio >= 0.8) label = 'Muy bien · 훌륭해';
+    else if (ratio >= 0.6) label = 'Bien · 나쁘지 않아';
+    else if (ratio >= 0.3) label = 'Otra vez · 다시 한 번';
+    else label = 'Despacio · 천천히, 다시';
     $('#resLabel').textContent = label;
 
     if (state.quiz.missed.length > 0) {
       $('#resMissed').style.display = 'block';
       $('#resMissedList').innerHTML = state.quiz.missed.map(card => {
-        if (card.kind === 'head') {
+        if (card.kind === 'term') {
           return `<div class="result-missed-item">
             <div class="ctx">단어</div>
             <div class="t">${escapeHtml(card.word.term)}</div>
             <div class="m">${escapeHtml(card.word.meaning)}</div>
           </div>`;
-        } else if (card.kind === 'expr') {
-          return `<div class="result-missed-item">
-            <div class="ctx">표현</div>
-            <div class="t">${escapeHtml(card.expr.phrase)}</div>
-            <div class="m">${escapeHtml(card.expr.meaning)}</div>
-          </div>`;
         } else {
           return `<div class="result-missed-item">
-            <div class="ctx">빈칸 — ${escapeHtml(card.expr.phrase)}</div>
-            <div class="t">${escapeHtml(card.expr.example)}</div>
+            <div class="ctx">빈칸 — ${escapeHtml(card.word.term)}</div>
+            <div class="t">${escapeHtml(card.example.text)}</div>
             <div class="m">정답: ${escapeHtml(card.match.matched)}</div>
           </div>`;
         }
@@ -2560,6 +2313,8 @@
     } else {
       $('#resMissed').style.display = 'none';
     }
+
+    state.quiz = null;
   }
 
   $('#btnRestart').addEventListener('click', resetQuizView);
@@ -2589,99 +2344,44 @@
     const reader = new FileReader();
     reader.onload = ev => {
       try {
-        const text = ev.target.result;
-        const parsed = JSON.parse(text);
-        let added = 0;
+        const parsed = JSON.parse(ev.target.result);
+        const migrated = migrateData(parsed);
+        if (!migrated) throw new Error('빈 데이터');
 
-        if (Array.isArray(parsed)) {
-          // Old flat array → import to current deck
-          const existing = new Set(
-            wordsInDeck(state.currentDeckId).map(w => w.term.toLowerCase())
-          );
-          parsed.forEach(w => {
-            if (!w.term || !w.meaning) return;
-            if (existing.has(w.term.toLowerCase())) return;
-            const nw = {
-              id: uid(),
-              deckId: state.currentDeckId,
-              term: w.term,
-              meaning: w.meaning,
-              expressions: Array.isArray(w.expressions) ? w.expressions.map(e => {
-                const ne = {
-                  id: e.id || uid(),
-                  phrase: e.phrase, meaning: e.meaning,
-                  example: e.example || '',
-                  exampleMeaning: e.exampleMeaning || '',
-                  correct: e.correct || 0, wrong: e.wrong || 0
-                };
-                if (e.srs) ne.srs = e.srs;
-                if (e.srsBlank) ne.srsBlank = e.srsBlank;
-                ensureExprSrs(ne);
-                return ne;
-              }) : [],
-              created: w.created || Date.now(),
-              correct: w.correct || 0,
-              wrong: w.wrong || 0
-            };
-            if (w.srs) nw.srs = w.srs;
-            ensureWordSrs(nw);
-            state.words.unshift(nw);
-            added++;
-          });
-        } else if (parsed && Array.isArray(parsed.decks) && Array.isArray(parsed.words)) {
-          const deckIdMap = {};
-          parsed.decks.forEach(d => {
-            const ex = state.decks.find(x => x.name === d.name);
-            if (ex) {
-              deckIdMap[d.id] = ex.id;
-            } else {
-              const newDeck = {
-                id: 'd_' + uid(),
-                name: d.name,
-                created: d.created || Date.now()
-              };
-              state.decks.push(newDeck);
-              deckIdMap[d.id] = newDeck.id;
-            }
-          });
-          const existingKeys = new Set(
-            state.words.map(w => `${w.deckId}::${w.term.toLowerCase()}`)
-          );
-          parsed.words.forEach(w => {
-            if (!w.term || !w.meaning) return;
-            const newDeckId = deckIdMap[w.deckId] || state.currentDeckId;
-            const key = `${newDeckId}::${w.term.toLowerCase()}`;
-            if (existingKeys.has(key)) return;
-            existingKeys.add(key);
-            const nw = {
-              id: uid(),
-              deckId: newDeckId,
-              term: w.term,
-              meaning: w.meaning,
-              expressions: Array.isArray(w.expressions) ? w.expressions.map(e => {
-                const ne = {
-                  id: e.id || uid(),
-                  phrase: e.phrase, meaning: e.meaning,
-                  example: e.example || '',
-                  exampleMeaning: e.exampleMeaning || '',
-                  correct: e.correct || 0, wrong: e.wrong || 0
-                };
-                if (e.srs) ne.srs = e.srs;
-                if (e.srsBlank) ne.srsBlank = e.srsBlank;
-                ensureExprSrs(ne);
-                return ne;
-              }) : [],
-              created: w.created || Date.now(),
-              correct: w.correct || 0,
-              wrong: w.wrong || 0
-            };
-            if (w.srs) nw.srs = w.srs;
-            ensureWordSrs(nw);
-            state.words.unshift(nw);
-            added++;
-          });
-        } else {
-          throw new Error('Unknown JSON format');
+        // Merge: add decks by name, merge words by (deck, term)
+        const deckIdMap = {};
+        (migrated.decks || []).forEach(d => {
+          const ex = state.decks.find(x => x.name === d.name);
+          if (ex) deckIdMap[d.id] = ex.id;
+          else {
+            const newDeck = { id: 'd_' + uid(), name: d.name, created: d.created || Date.now() };
+            if (d.lang) newDeck.lang = d.lang;
+            state.decks.push(newDeck);
+            deckIdMap[d.id] = newDeck.id;
+          }
+        });
+        const existingKeys = new Set(state.words.map(w => `${w.deckId}::${w.term.toLowerCase()}`));
+        let added = 0;
+        for (const w of (migrated.words || [])) {
+          const newDeckId = deckIdMap[w.deckId] || state.currentDeckId;
+          const key = `${newDeckId}::${w.term.toLowerCase()}`;
+          if (existingKeys.has(key)) continue;
+          existingKeys.add(key);
+          const nw = {
+            id: uid(),
+            deckId: newDeckId,
+            term: w.term, meaning: w.meaning,
+            examples: Array.isArray(w.examples) ? w.examples.map(e => ({
+              id: uid(), text: e.text, meaning: e.meaning || ''
+            })) : [],
+            created: w.created || Date.now(),
+            correct: w.correct || 0, wrong: w.wrong || 0
+          };
+          if (w.srs) nw.srs = w.srs;
+          if (w.srsBlank) nw.srsBlank = w.srsBlank;
+          ensureWord(nw);
+          state.words.unshift(nw);
+          added++;
         }
         save();
         renderDeckBar();
@@ -2698,10 +2398,7 @@
   });
 
   $('#btnReset').addEventListener('click', () => {
-    if (state.words.length === 0 && state.decks.length <= 1) {
-      toast('이미 비어있어');
-      return;
-    }
+    if (state.words.length === 0 && state.decks.length <= 1) { toast('이미 비어있어'); return; }
     if (confirm(`전체 단어장(${state.decks.length}개)과 단어(${state.words.length}개)를 모두 삭제할까? (되돌릴 수 없음)`)) {
       state.decks = [];
       state.words = [];
@@ -2717,13 +2414,11 @@
   });
 
   // ===== Init =====
-  // Local state always loads first (instant render, offline-friendly)
   load();
   renderDeckBar();
   updateMeta();
   renderList();
 
-  // Auth + sync wiring
   $('#btnSignin').addEventListener('click', handleSignin);
   $('#btnSignup').addEventListener('click', handleSignup);
   $('#btnLogout').addEventListener('click', handleLogout);
@@ -2734,18 +2429,13 @@
     if (e.key === 'Enter') { e.preventDefault(); $('#authPassword').focus(); }
   });
 
-  // Pull on focus / visibility change (catch updates from other devices)
   window.addEventListener('focus', () => { if (currentUser) syncPull(); });
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && currentUser) syncPull();
   });
-  // Retry push when coming back online
-  window.addEventListener('online', () => {
-    if (currentUser) syncPush();
-  });
+  window.addEventListener('online', () => { if (currentUser) syncPush(); });
   window.addEventListener('offline', () => setSyncStatus('offline'));
 
-  // Check existing session
   (async () => {
     const { data: { session } } = await sb.auth.getSession();
     if (session && session.user) {
@@ -2759,7 +2449,6 @@
     }
   })();
 
-  // React to auth state changes (token refresh, sign out from another tab, etc.)
   sb.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_OUT') {
       currentUser = null;
