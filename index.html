@@ -2098,20 +2098,85 @@
   }
 
   // ===== Answer matching =====
-  // Normalize for comparison: trim, lowercase, strip diacritics, strip edge punctuation.
+  // Strip everything except letters and numbers (any script). Whitespace, punctuation,
+  // brackets, and symbols are all ignored when comparing.
   function normalizeAnswer(s) {
-    return String(s || '').trim().toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/^[.,;:!?¿¡"'(){}\[\]\s]+/, '')
-      .replace(/[.,;:!?¿¡"'(){}\[\]\s]+$/, '');
+    return String(s || '').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC')
+      .replace(/[^\p{L}\p{N}]/gu, '');
   }
-  // Match user input against correct answer, supporting comma/slash-separated alternatives.
+
+  // Split text by top-level , / 또는 or, respecting bracket depth.
+  function splitTopLevel(text) {
+    const parts = [];
+    let current = '';
+    let depth = 0;
+    const s = String(text || '');
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      if (ch === '[') depth++;
+      else if (ch === ']') depth = Math.max(0, depth - 1);
+      if (depth === 0 && (ch === ',' || ch === '/')) {
+        if (current.trim()) parts.push(current);
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+    if (current.trim()) parts.push(current);
+    // Also split by "또는"/"or" keywords
+    const final = [];
+    for (const p of parts) {
+      const sub = p.split(/\s+(?:또는|or)\s+/i);
+      for (const x of sub) if (x.trim()) final.push(x);
+    }
+    return final;
+  }
+
+  // Expand bracket notation: WORD[alt1, alt2] yields {WORD, alt1, alt2} substituting WORD.
+  // Each [...] replaces the immediately preceding non-whitespace token.
+  // Multiple bracket groups produce the cartesian product.
+  function expandBrackets(text) {
+    let variants = [String(text || '')];
+    let safety = 20;
+    while (safety-- > 0) {
+      let changed = false;
+      const next = [];
+      for (const v of variants) {
+        const m = v.match(/(\S+?)\s*\[([^\]]+)\]/);
+        if (!m) { next.push(v); continue; }
+        changed = true;
+        const word = m[1];
+        const inner = m[2];
+        const before = v.slice(0, m.index);
+        const after = v.slice(m.index + m[0].length);
+        const alts = inner.split(/\s*[,/]\s*/).map(x => x.trim()).filter(Boolean);
+        next.push(before + word + after);
+        for (const alt of alts) next.push(before + alt + after);
+      }
+      variants = next;
+      if (!changed) break;
+    }
+    return [...new Set(variants)];
+  }
+
+  // Match user input against correct answer. Both go through split + bracket expansion.
   function checkAnswerMatch(userInput, correctAnswer) {
-    const userNorm = normalizeAnswer(userInput);
-    if (!userNorm) return false;
-    const alternatives = String(correctAnswer || '').split(/\s*[,/]\s*|\s+또는\s+|\s+or\s+/i);
-    for (const alt of alternatives) {
-      if (normalizeAnswer(alt) === userNorm) return true;
+    function variantsOf(text) {
+      const out = new Set();
+      for (const alt of splitTopLevel(text)) {
+        for (const v of expandBrackets(alt)) {
+          const n = normalizeAnswer(v);
+          if (n) out.add(n);
+        }
+      }
+      return out;
+    }
+    const correctSet = variantsOf(correctAnswer);
+    if (correctSet.size === 0) return false;
+    const userSet = variantsOf(userInput);
+    for (const u of userSet) {
+      if (correctSet.has(u)) return true;
     }
     return false;
   }
