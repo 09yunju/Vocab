@@ -8,19 +8,19 @@
 <title>Vocabulario.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    /* Mediterranean / olive grove palette */
-    --paper:      #f5ebd6;   /* warm cream, like aged manuscript */
-    --paper-2:    #ecdec4;   /* slightly darker cream for cards */
-    --paper-soft: #fbf5e6;   /* lightest tone for inputs on focus */
+    /* Olive grove + ivory palette */
+    --paper:      #faf8f1;   /* near-white ivory, very subtle warmth */
+    --paper-2:    #efece0;   /* light cream for cards (visible against ivory) */
+    --paper-soft: #ffffff;   /* pure white for focused inputs */
     --ink:        #3a2114;   /* deep warm brown */
     --ink-soft:   #5e3a26;   /* medium brown */
     --ink-faint:  #a08066;   /* faded brown */
-    --rule:       #c9a87b;   /* warm sand, for borders */
-    --rule-soft:  #ddc59c;   /* lighter sand */
+    --rule:       #d6cdb6;   /* light sand for borders */
+    --rule-soft:  #e7e0cd;   /* lighter sand */
     --accent:     #5d7437;   /* olive green, primary accent */
     --accent-2:   #a3a849;   /* light olive */
     --ochre:      #d99d2b;   /* saffron / Andalusian gold */
@@ -28,7 +28,7 @@
     --olive:      #8a8748;   /* muted olive */
     --bad:        #8a3a3a;   /* deep wine, only for wrong/error */
 
-    --shadow: 0 1px 0 rgba(58, 33, 20, 0.06), 0 14px 42px -12px rgba(58, 33, 20, 0.18);
+    --shadow: 0 1px 0 rgba(58, 33, 20, 0.04), 0 14px 42px -12px rgba(58, 33, 20, 0.14);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,7 +36,7 @@
   html, body {
     background: var(--paper);
     color: var(--ink);
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
@@ -44,9 +44,9 @@
 
   body {
     background-image:
-      radial-gradient(circle at 12% 22%, rgba(217, 157, 43, 0.08) 0%, transparent 45%),
-      radial-gradient(circle at 88% 78%, rgba(93, 116, 55, 0.07) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(138, 135, 72, 0.04) 0%, transparent 60%);
+      radial-gradient(circle at 12% 22%, rgba(217, 157, 43, 0.05) 0%, transparent 45%),
+      radial-gradient(circle at 88% 78%, rgba(93, 116, 55, 0.05) 0%, transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(138, 135, 72, 0.03) 0%, transparent 60%);
   }
 
   .app {
@@ -68,7 +68,7 @@
   }
 
   h1 {
-    font-family: 'Playfair Display', 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Playfair Display', 'Fraunces', 'Noto Sans KR', sans-serif;
     font-weight: 800;
     font-size: 44px;
     letter-spacing: -0.015em;
@@ -79,7 +79,7 @@
   h1 .dot { color: var(--accent); }
 
   .meta {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 13px;
     color: var(--ink-faint);
@@ -106,7 +106,7 @@
     padding: 6px 14px;
     border-radius: 999px;
     cursor: pointer;
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
     font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
@@ -125,11 +125,11 @@
   .deck-pill.add {
     color: var(--ink-faint);
     border-style: dashed;
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
   }
   .deck-pill .deck-count {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 11px;
     opacity: 0.7;
@@ -179,7 +179,7 @@
   .tab {
     background: none;
     border: none;
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
     font-size: 14px;
     font-weight: 500;
     padding: 10px 16px;
@@ -201,7 +201,7 @@
     background: var(--accent);
   }
   .tab .count {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 12px;
     color: var(--ink-faint);
@@ -221,7 +221,7 @@
 
   label {
     display: block;
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 13px;
     color: var(--ink-soft);
@@ -234,7 +234,7 @@
     border: 1px solid var(--rule);
     border-radius: 2px;
     padding: 12px 14px;
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
     font-size: 16px;
     color: var(--ink);
     transition: border-color 0.15s, background 0.15s;
@@ -253,7 +253,7 @@
     color: var(--paper);
     border: none;
     padding: 12px 22px;
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -276,7 +276,7 @@
   .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
   .add-context {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 13px;
     color: var(--ink-faint);
@@ -298,7 +298,7 @@
     gap: 12px;
   }
   .section-divider .title {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 14px;
     color: var(--ink-soft);
@@ -312,7 +312,7 @@
     opacity: 0.6;
   }
   .section-divider .hint {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 11px;
     color: var(--ink-faint);
@@ -361,7 +361,7 @@
     padding: 12px;
     width: 100%;
     cursor: pointer;
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 13px;
     border-radius: 2px;
@@ -393,7 +393,7 @@
   }
 
   .word-term {
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-size: 22px;
     font-weight: 500;
     color: var(--ink);
@@ -408,7 +408,7 @@
 
   .word-actions {
     text-align: right;
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 12px;
     color: var(--ink-faint);
@@ -442,7 +442,7 @@
     border-bottom: 1px dotted var(--rule);
   }
   .word-example-text {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 14px;
     color: var(--ink-soft);
@@ -459,7 +459,7 @@
     text-align: center;
     padding: 60px 20px;
     color: var(--ink-faint);
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 16px;
   }
@@ -481,7 +481,7 @@
     margin-bottom: 20px;
   }
   .quiz-setup h3 {
-    font-family: 'Playfair Display', 'Fraunces', serif;
+    font-family: 'Playfair Display', 'Fraunces', 'Noto Sans KR', sans-serif;
     font-weight: 500;
     font-size: 22px;
     margin-bottom: 16px;
@@ -512,7 +512,7 @@
     border-color: var(--ink);
   }
   .quiz-deck-count {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 11px;
     opacity: 0.65;
@@ -539,7 +539,7 @@
   }
 
   .quiz-progress {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 13px;
     color: var(--ink-faint);
@@ -548,7 +548,7 @@
     z-index: 1;
   }
   .quiz-kind {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 11px;
     color: var(--accent);
@@ -560,7 +560,7 @@
   }
 
   .quiz-question {
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-size: 38px;
     font-weight: 500;
     line-height: 1.2;
@@ -576,7 +576,7 @@
   }
 
   .quiz-hint {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 13px;
     color: var(--ink-faint);
@@ -598,7 +598,7 @@
   .quiz-answer .note {
     display: block;
     margin-top: 8px;
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 14px;
     color: var(--ink-faint);
@@ -627,7 +627,7 @@
     flex: 1 1 0;
     min-width: 0;
     padding: 10px 6px;
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
     font-size: 13px;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -646,7 +646,7 @@
   .btn-grade .interval {
     font-size: 10px;
     font-weight: 400;
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     opacity: 0.8;
   }
@@ -720,7 +720,7 @@
     flex-wrap: wrap;
   }
   .quiz-blank-input-row input {
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-size: 20px;
     padding: 10px 16px;
     background: var(--paper);
@@ -737,7 +737,7 @@
   }
 
   .quiz-feedback {
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-weight: 500;
     display: inline;
   }
@@ -768,7 +768,7 @@
     margin-bottom: 20px;
   }
   .result-score {
-    font-family: 'Playfair Display', 'Fraunces', serif;
+    font-family: 'Playfair Display', 'Fraunces', 'Noto Sans KR', sans-serif;
     font-size: 64px;
     font-weight: 700;
     line-height: 1;
@@ -776,7 +776,7 @@
   }
   .result-score .slash { color: var(--ink-faint); margin: 0 4px; font-weight: 400; }
   .result-label {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     color: var(--ink-faint);
     margin-bottom: 32px;
@@ -790,7 +790,7 @@
     padding-top: 20px;
   }
   .result-missed h4 {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 14px;
     color: var(--ink-faint);
@@ -802,7 +802,7 @@
     border-bottom: 1px solid var(--paper-2);
   }
   .result-missed-item .t {
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-size: 17px;
     font-weight: 500;
   }
@@ -812,7 +812,7 @@
     margin-top: 2px;
   }
   .result-missed-item .ctx {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 11px;
     color: var(--accent);
@@ -845,7 +845,7 @@
     padding: 28px;
   }
   .modal h3 {
-    font-family: 'Playfair Display', 'Fraunces', serif;
+    font-family: 'Playfair Display', 'Fraunces', 'Noto Sans KR', sans-serif;
     font-weight: 500;
     font-size: 24px;
     margin-bottom: 20px;
@@ -906,8 +906,8 @@
     inset: 0;
     background: var(--paper);
     background-image:
-      radial-gradient(circle at 20% 30%, rgba(217, 157, 43, 0.1) 0%, transparent 45%),
-      radial-gradient(circle at 80% 70%, rgba(93, 116, 55, 0.08) 0%, transparent 45%);
+      radial-gradient(circle at 20% 30%, rgba(217, 157, 43, 0.06) 0%, transparent 45%),
+      radial-gradient(circle at 80% 70%, rgba(93, 116, 55, 0.06) 0%, transparent 45%);
     z-index: 500;
     display: flex;
     align-items: center;
@@ -919,7 +919,7 @@
     max-width: 360px;
   }
   .auth-card h2 {
-    font-family: 'Playfair Display', 'Fraunces', serif;
+    font-family: 'Playfair Display', 'Fraunces', 'Noto Sans KR', sans-serif;
     font-weight: 800;
     font-size: 42px;
     letter-spacing: -0.015em;
@@ -927,7 +927,7 @@
   }
   .auth-card h2 .dot { color: var(--accent); }
   .auth-card .auth-sub {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 13px;
     color: var(--ink-faint);
@@ -940,7 +940,7 @@
     border: 1px solid var(--rule);
     border-radius: 2px;
     padding: 12px 14px;
-    font-family: 'Fraunces', 'Noto Serif KR', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-size: 16px;
     color: var(--ink);
   }
@@ -951,7 +951,7 @@
   }
   .auth-error {
     color: var(--bad);
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 13px;
     margin-bottom: 12px;
@@ -962,7 +962,7 @@
 
   /* Sync status */
   .sync-status {
-    font-family: 'Fraunces', serif;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     font-size: 11px;
     color: var(--ink-faint);
