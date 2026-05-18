@@ -525,103 +525,7 @@
     margin-left: 4px;
   }
 
-  .quiz-card {
-    background: var(--paper-2);
-    border: 1px solid var(--rule);
-    padding: 48px 28px;
-    border-radius: 2px;
-    text-align: center;
-    box-shadow: var(--shadow);
-    position: relative;
-    overflow: hidden;
-  }
-  .quiz-card::before {
-    content: '';
-    position: absolute;
-    top: 16px; left: 16px; right: 16px; bottom: 16px;
-    border: 1px solid var(--rule);
-    pointer-events: none;
-    border-radius: 1px;
-  }
-
-  .quiz-progress {
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-style: italic;
-    font-size: 13px;
-    color: var(--ink-faint);
-    margin-bottom: 4px;
-    position: relative;
-    z-index: 1;
-  }
-  .quiz-kind {
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-style: italic;
-    font-size: 11px;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 18px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .quiz-question {
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-size: 38px;
-    font-weight: 500;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    margin-bottom: 12px;
-    position: relative;
-    z-index: 1;
-    word-break: keep-all;
-  }
-  .quiz-question.is-sentence {
-    font-size: 24px;
-    line-height: 1.5;
-  }
-
-  .quiz-hint {
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-style: italic;
-    font-size: 13px;
-    color: var(--ink-faint);
-    position: relative;
-    z-index: 1;
-  }
-
-  .quiz-answer {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px dashed var(--rule);
-    font-size: 22px;
-    color: var(--ink-soft);
-    font-weight: 500;
-    position: relative;
-    z-index: 1;
-    animation: fade 0.3s ease;
-  }
-  .quiz-answer .note {
-    display: block;
-    margin-top: 8px;
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-style: italic;
-    font-size: 14px;
-    color: var(--ink-faint);
-    font-weight: 400;
-  }
-
-  .quiz-controls {
-    display: flex;
-    gap: 8px;
-    margin-top: 24px;
-    justify-content: center;
-    flex-wrap: wrap;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* SRS 4-grade buttons */
+  /* SRS 3-grade buttons */
   .grade-row {
     display: flex;
     gap: 6px;
@@ -698,52 +602,7 @@
   }
   .speak-btn-tiny:hover { color: var(--accent); }
 
-  /* Quiz typing input */
-  .quiz-blank-input-row {
-    margin-top: 24px;
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .quiz-blank-input-row input {
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-size: 20px;
-    padding: 10px 16px;
-    background: var(--paper);
-    border: 1px solid var(--rule);
-    border-radius: 2px;
-    text-align: center;
-    width: auto;
-    max-width: 240px;
-  }
-  .quiz-blank-input-row input:focus {
-    outline: none;
-    border-color: var(--ink);
-    background: var(--paper-soft);
-  }
-
-  .quiz-feedback {
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-weight: 500;
-    display: inline;
-  }
-  .quiz-feedback.correct { color: var(--good); }
-  .quiz-feedback.wrong { color: var(--ink-soft); }
-  .quiz-feedback .user-ans {
-    text-decoration: line-through;
-    color: var(--bad);
-    margin-right: 6px;
-  }
-  .quiz-feedback .arrow {
-    margin: 0 6px;
-    color: var(--ink-faint);
-    font-style: italic;
-  }
-  .quiz-feedback .correct-ans { color: var(--good); }
-
-  /* Result */
+  /* Result (end-of-session) */
   .result {
     text-align: center;
     padding: 40px 20px;
@@ -755,58 +614,12 @@
     opacity: 0.5;
     margin-bottom: 20px;
   }
-  .result-score {
-    font-family: 'Playfair Display', 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-size: 64px;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 8px;
-  }
-  .result-score .slash { color: var(--ink-faint); margin: 0 4px; font-weight: 400; }
   .result-label {
     font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
     font-style: italic;
     color: var(--ink-faint);
     margin-bottom: 32px;
     font-size: 15px;
-  }
-
-  .result-missed {
-    text-align: left;
-    margin-top: 24px;
-    border-top: 1px solid var(--rule);
-    padding-top: 20px;
-  }
-  .result-missed h4 {
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-style: italic;
-    font-size: 14px;
-    color: var(--ink-faint);
-    margin-bottom: 12px;
-    font-weight: 400;
-  }
-  .result-missed-item {
-    padding: 10px 0;
-    border-bottom: 1px solid var(--paper-2);
-  }
-  .result-missed-item .t {
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-size: 17px;
-    font-weight: 500;
-  }
-  .result-missed-item .m {
-    color: var(--ink-soft);
-    font-size: 14px;
-    margin-top: 2px;
-  }
-  .result-missed-item .ctx {
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-style: italic;
-    font-size: 11px;
-    color: var(--accent);
-    margin-bottom: 2px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
   }
 
   /* Modal */
@@ -1085,30 +898,45 @@
     margin-bottom: 22px;
   }
 
-  .study-nav {
+  .study-breakdown {
+    margin: 16px auto 8px;
+    max-width: 280px;
+    text-align: left;
+  }
+  .study-stat-row {
     display: flex;
-    gap: 8px;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
+    padding: 8px 4px;
+    border-bottom: 1px dashed var(--rule);
   }
-  .study-nav .nav-prev, .study-nav .nav-next {
-    flex: 1;
+  .study-stat-row:last-of-type {
+    border-bottom: none;
   }
-  .study-nav .nav-prev { max-width: 140px; }
-  .study-nav .nav-next {
-    background: var(--ink);
-    color: var(--paper);
+  .study-stat-label {
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
   }
-  .study-nav .nav-spacer { flex: 1; }
-  .study-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .study-stat-value {
+    font-family: 'Playfair Display', 'Noto Sans KR', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .study-stat-total {
+    margin-top: 14px;
+    text-align: center;
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
 
   @media (max-width: 480px) {
     .app { padding: 24px 16px 60px; }
     h1 { font-size: 32px; }
-    .quiz-question { font-size: 30px; }
-    .quiz-question.is-sentence { font-size: 20px; }
-    .quiz-card { padding: 36px 20px; }
-    .result-score { font-size: 50px; }
+    .quiz-setup { padding: 18px; }
     .modal { padding: 22px; }
     .auth-card h2 { font-size: 36px; }
     .flip-card-front, .flip-card-back { padding: 36px 20px; }
@@ -1130,7 +958,6 @@
     <button class="tab active" data-tab="add">추가</button>
     <button class="tab" data-tab="list">목록 <span class="count" id="countList">0</span></button>
     <button class="tab" data-tab="study">공부</button>
-    <button class="tab" data-tab="quiz">시험</button>
   </nav>
 
   <!-- ADD -->
@@ -1195,68 +1022,18 @@
           <div class="flip-card-back" id="flipBack"></div>
         </div>
       </div>
-      <div class="study-hint">탭하면 뒤집기 · 스페이스/← →</div>
-      <div class="study-nav">
-        <button class="btn btn-ghost nav-prev" id="btnPrevStudy">← 이전</button>
-        <button class="btn nav-next" id="btnNextStudy">다음 →</button>
+      <div class="study-hint" id="studyHint">탭하면 답 보기 · 스페이스</div>
+      <div class="grade-row" id="studyGrades" style="display:none;"></div>
+      <div style="text-align:center; margin-top: 18px;">
+        <button class="btn-tiny" id="btnStudyEnd">끝내기</button>
       </div>
     </div>
 
     <div id="studyDone" class="result" style="display:none;">
       <div class="result-ornament">· · ·</div>
-      <div class="result-label" style="margin-bottom:24px;">¡Bien hecho! 다 봤어</div>
-      <button class="btn" id="btnStudyRestart">다시</button>
-    </div>
-  </section>
-
-  <!-- QUIZ -->
-  <section class="panel" id="panel-quiz">
-    <div id="quizSetup" class="quiz-setup">
-      <h3>시험 설정</h3>
-      <div class="field">
-        <label>단어장 <span style="font-style:normal;font-size:11px;color:var(--ink-faint);">(여러 개 선택 가능)</span></label>
-        <div class="opt-row" id="quizDeckOpts"></div>
-      </div>
-      <div class="field">
-        <label>방향</label>
-        <div class="opt-row" id="dirOpts">
-          <button class="opt active" data-dir="t2m">단어 → 뜻</button>
-          <button class="opt" data-dir="m2t">뜻 → 단어</button>
-          <button class="opt" data-dir="mix">섞기</button>
-        </div>
-      </div>
-      <div class="field">
-        <label>문제 수</label>
-        <div class="opt-row" id="countOpts">
-          <button class="opt" data-n="5">5</button>
-          <button class="opt active" data-n="10">10</button>
-          <button class="opt" data-n="20">20</button>
-          <button class="opt" data-n="all">전체</button>
-        </div>
-      </div>
-      <button class="btn" id="btnStartQuiz">시작</button>
-    </div>
-
-    <div id="quizCard" class="quiz-card" style="display:none;">
-      <div class="quiz-progress" id="quizProgress"></div>
-      <div class="quiz-kind" id="quizKind"></div>
-      <div class="quiz-question" id="quizQuestion"></div>
-      <div class="quiz-hint" id="quizHint"></div>
-      <div class="quiz-answer" id="quizAnswer" style="display:none;"></div>
-      <div class="quiz-controls" id="quizControls"></div>
-    </div>
-
-    <div id="quizResult" class="result" style="display:none;">
-      <div class="result-ornament">· · ·</div>
-      <div class="result-score">
-        <span id="resCorrect">0</span><span class="slash">/</span><span id="resTotal">0</span>
-      </div>
-      <div class="result-label" id="resLabel">잘했어!</div>
-      <button class="btn" id="btnRestart">다시</button>
-      <div class="result-missed" id="resMissed" style="display:none;">
-        <h4>틀린 것</h4>
-        <div id="resMissedList"></div>
-      </div>
+      <div class="result-label" id="studyDoneLabel" style="margin-bottom:8px;">¡Bien hecho!</div>
+      <div class="study-breakdown" id="studyBreakdown"></div>
+      <button class="btn" id="btnStudyRestart" style="margin-top:24px;">다시</button>
     </div>
   </section>
 
@@ -1320,11 +1097,8 @@
     decks: [],
     currentDeckId: null,
     words: [],
-    quiz: null,
     lastSyncedAt: 0
   };
-
-  let quizSelectedDecks = new Set();
 
   // ===== Helpers =====
   function $(s) { return document.querySelector(s); }
@@ -1583,7 +1357,7 @@
 
   async function syncPull() {
     if (!currentUser || isSyncing) return;
-    if (state.quiz || studyState) return;
+    if (studyState) return;
     if (!navigator.onLine) { setSyncStatus('offline'); return; }
     isSyncing = true;
     setSyncStatus('syncing');
@@ -1664,7 +1438,6 @@
     updateMeta();
     if ($('#panel-list').classList.contains('active')) renderList();
     if ($('#panel-study').classList.contains('active')) resetStudyView();
-    if ($('#panel-quiz').classList.contains('active')) resetQuizView();
   }
 
   // ===== Auth =====
@@ -1726,7 +1499,6 @@
     $$('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
     if (name === 'list') renderList();
     if (name === 'study') resetStudyView();
-    if (name === 'quiz') resetQuizView();
   }
   $$('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
 
@@ -1800,7 +1572,7 @@
     if (!confirm(msg)) return;
     state.decks = state.decks.filter(d => d.id !== deckId);
     state.words = state.words.filter(w => w.deckId !== deckId);
-    quizSelectedDecks.delete(deckId);
+    studySelectedDecks.delete(deckId);
     if (state.currentDeckId === deckId) state.currentDeckId = state.decks[0].id;
     save();
     renderDeckBar();
@@ -2107,106 +1879,7 @@
     });
   }
 
-  // ===== Answer matching =====
-  // Strip everything except letters and numbers (any script). Whitespace, punctuation,
-  // brackets, and symbols are all ignored when comparing.
-  function normalizeAnswer(s) {
-    return String(s || '').toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC')
-      .replace(/[^\p{L}\p{N}]/gu, '');
-  }
-
-  // Split text by top-level , / 또는 or, respecting bracket depth.
-  function splitTopLevel(text) {
-    const parts = [];
-    let current = '';
-    let depth = 0;
-    const s = String(text || '');
-    for (let i = 0; i < s.length; i++) {
-      const ch = s[i];
-      if (ch === '[') depth++;
-      else if (ch === ']') depth = Math.max(0, depth - 1);
-      if (depth === 0 && (ch === ',' || ch === '/')) {
-        if (current.trim()) parts.push(current);
-        current = '';
-      } else {
-        current += ch;
-      }
-    }
-    if (current.trim()) parts.push(current);
-    // Also split by "또는"/"or" keywords
-    const final = [];
-    for (const p of parts) {
-      const sub = p.split(/\s+(?:또는|or)\s+/i);
-      for (const x of sub) if (x.trim()) final.push(x);
-    }
-    return final;
-  }
-
-  // Expand bracket notation: WORD[alt1, alt2] yields {WORD, alt1, alt2} substituting WORD.
-  // Each [...] replaces the immediately preceding non-whitespace token.
-  // Multiple bracket groups produce the cartesian product.
-  function expandBrackets(text) {
-    let variants = [String(text || '')];
-    let safety = 20;
-    while (safety-- > 0) {
-      let changed = false;
-      const next = [];
-      for (const v of variants) {
-        const m = v.match(/(\S+?)\s*\[([^\]]+)\]/);
-        if (!m) { next.push(v); continue; }
-        changed = true;
-        const word = m[1];
-        const inner = m[2];
-        const before = v.slice(0, m.index);
-        const after = v.slice(m.index + m[0].length);
-        const alts = inner.split(/\s*[,/]\s*/).map(x => x.trim()).filter(Boolean);
-        next.push(before + word + after);
-        for (const alt of alts) next.push(before + alt + after);
-      }
-      variants = next;
-      if (!changed) break;
-    }
-    return [...new Set(variants)];
-  }
-
-  // Match user input against correct answer. Both go through split + bracket expansion.
-  function checkAnswerMatch(userInput, correctAnswer) {
-    function variantsOf(text) {
-      const out = new Set();
-      for (const alt of splitTopLevel(text)) {
-        for (const v of expandBrackets(alt)) {
-          const n = normalizeAnswer(v);
-          if (n) out.add(n);
-        }
-      }
-      return out;
-    }
-    const correctSet = variantsOf(correctAnswer);
-    if (correctSet.size === 0) return false;
-    const userSet = variantsOf(userInput);
-    for (const u of userSet) {
-      if (correctSet.has(u)) return true;
-    }
-    return false;
-  }
-
-  // ===== Quiz card building =====
-  // Card shape: { kind: 'term', word, dir: 't2m'|'m2t' }
-  function buildCards(words, mode) {
-    const cards = [];
-    for (const w of words) {
-      if (mode === 't2m' || mode === 'm2t') {
-        cards.push({ kind: 'term', word: w, dir: mode });
-      } else if (mode === 'mix') {
-        const dir = Math.random() < 0.5 ? 't2m' : 'm2t';
-        cards.push({ kind: 'term', word: w, dir });
-      }
-    }
-    return cards;
-  }
-
-  // ===== Study (flashcards) =====
+  // ===== Study (flashcards with SRS grading) =====
   let studyState = null;
   let studyDir = 't2m';
   let studySelectedDecks = new Set();
@@ -2258,14 +1931,27 @@
     const pool = state.words.filter(w => studySelectedDecks.has(w.deckId));
     if (pool.length === 0) { toast('선택한 단어장에 단어가 없어'); return; }
 
-    const cards = pool.slice();
-    cards.sort(() => Math.random() - 0.5);
-    // Resolve direction per card if mix
-    cards.forEach(c => {
-      c._studyDir = studyDir === 'mix' ? (Math.random() < 0.5 ? 't2m' : 'm2t') : studyDir;
+    // Sort by SRS priority (most overdue first), with small jitter for variety
+    const now = Date.now();
+    const sorted = pool.slice();
+    sorted.forEach(w => {
+      const srs = w.srs || defaultSrs();
+      w._priority = (now - srs.due) / DAY_MS + Math.random() * 0.3;
     });
+    sorted.sort((a, b) => b._priority - a._priority);
 
-    studyState = { cards, idx: 0, flipped: false };
+    // Build cards with direction
+    const cards = sorted.map(w => ({
+      word: w,
+      dir: studyDir === 'mix' ? (Math.random() < 0.5 ? 't2m' : 'm2t') : studyDir
+    }));
+
+    studyState = {
+      cards,
+      idx: 0,
+      flipped: false,
+      counts: { good: 0, hard: 0, again: 0 }
+    };
 
     $('#studySetup').style.display = 'none';
     $('#studyView').style.display = 'block';
@@ -2277,28 +1963,30 @@
     if (!studyState) return;
     const card = studyState.cards[studyState.idx];
 
-    // Reset flipped (instant, no animation between cards)
+    // Reset to front face instantly (no animation between cards)
     const inner = $('#flipCardInner');
     inner.style.transition = 'none';
     $('#flipCard').classList.remove('flipped');
     studyState.flipped = false;
+    $('#studyGrades').style.display = 'none';
+    $('#studyHint').style.display = 'block';
     requestAnimationFrame(() => {
       requestAnimationFrame(() => { inner.style.transition = ''; });
     });
 
     $('#studyProgress').textContent = `${studyState.idx + 1} / ${studyState.cards.length}`;
 
-    const dir = card._studyDir || 't2m';
-    const deckLang = getDeckLang(card.deckId);
+    const dir = card.dir || 't2m';
+    const deckLang = getDeckLang(card.word.deckId);
+    const w = card.word;
 
     const front = $('#flipFront');
     const back = $('#flipBack');
 
-    // Helpers
-    function buildExamplesHtml(card) {
-      if (!card.examples || card.examples.length === 0) return '';
+    function buildExamplesHtml(c) {
+      if (!c.word.examples || c.word.examples.length === 0) return '';
       let html = '<div class="flip-back-examples">';
-      for (const ex of card.examples) {
+      for (const ex of c.word.examples) {
         html += `<div class="flip-back-example">${escapeHtml(ex.text)}<button class="speak-btn-tiny" data-speak-ex="${escapeAttr(ex.text)}" type="button">♪</button>`;
         if (ex.meaning) {
           html += `<div class="flip-back-example-meaning">${escapeHtml(ex.meaning)}</div>`;
@@ -2310,36 +1998,31 @@
     }
 
     if (dir === 't2m') {
-      // Front: term (Spanish)
       front.innerHTML = `<div class="flip-side-main"></div>`;
       const fEl = front.querySelector('.flip-side-main');
-      fEl.textContent = card.term;
+      fEl.textContent = w.term;
       const sBtn = document.createElement('button');
       sBtn.className = 'speak-btn';
       sBtn.title = '발음';
       sBtn.textContent = '♪';
       sBtn.type = 'button';
-      sBtn.addEventListener('click', e => { e.stopPropagation(); speak(card.term, deckLang); });
+      sBtn.addEventListener('click', e => { e.stopPropagation(); speak(w.term, deckLang); });
       fEl.appendChild(sBtn);
-      // Back: meaning + examples
-      back.innerHTML = `<div class="flip-side-main flip-side-meaning">${escapeHtml(card.meaning)}</div>` + buildExamplesHtml(card);
+      back.innerHTML = `<div class="flip-side-main flip-side-meaning">${escapeHtml(w.meaning)}</div>` + buildExamplesHtml(card);
     } else {
-      // Front: meaning (Korean)
-      front.innerHTML = `<div class="flip-side-main flip-side-meaning">${escapeHtml(card.meaning)}</div>`;
-      // Back: term + examples
+      front.innerHTML = `<div class="flip-side-main flip-side-meaning">${escapeHtml(w.meaning)}</div>`;
       back.innerHTML = `<div class="flip-side-main"></div>` + buildExamplesHtml(card);
       const bEl = back.querySelector('.flip-side-main');
-      bEl.textContent = card.term;
+      bEl.textContent = w.term;
       const sBtn = document.createElement('button');
       sBtn.className = 'speak-btn';
       sBtn.title = '발음';
       sBtn.textContent = '♪';
       sBtn.type = 'button';
-      sBtn.addEventListener('click', e => { e.stopPropagation(); speak(card.term, deckLang); });
+      sBtn.addEventListener('click', e => { e.stopPropagation(); speak(w.term, deckLang); });
       bEl.appendChild(sBtn);
     }
 
-    // Wire up example speak buttons (always on back)
     back.querySelectorAll('[data-speak-ex]').forEach(b => {
       b.addEventListener('click', e => {
         e.stopPropagation();
@@ -2347,11 +2030,28 @@
       });
     });
 
-    $('#btnPrevStudy').disabled = studyState.idx === 0;
-    $('#btnNextStudy').textContent = studyState.idx + 1 >= studyState.cards.length ? '끝내기 ✓' : '다음 →';
+    // Render grade buttons (hidden until flipped)
+    renderStudyGrades();
 
-    // Match inner height to taller of front/back so absolute-positioned faces fit
     requestAnimationFrame(() => requestAnimationFrame(adjustFlipHeight));
+  }
+
+  function renderStudyGrades() {
+    if (!studyState) return;
+    const card = studyState.cards[studyState.idx];
+    const srs = card.word.srs || defaultSrs();
+    const wrap = $('#studyGrades');
+    wrap.innerHTML = `
+      <button class="btn-grade btn-again" data-rating="again" type="button">모름<span class="interval">${previewInterval(srs, 'again')}</span></button>
+      <button class="btn-grade btn-hard" data-rating="hard" type="button">애매함<span class="interval">${previewInterval(srs, 'hard')}</span></button>
+      <button class="btn-grade btn-good" data-rating="good" type="button">잘 앎<span class="interval">${previewInterval(srs, 'good')}</span></button>
+    `;
+    wrap.querySelectorAll('[data-rating]').forEach(b => {
+      b.addEventListener('click', e => {
+        e.stopPropagation();
+        gradeStudyCard(b.dataset.rating);
+      });
+    });
   }
 
   function adjustFlipHeight() {
@@ -2386,305 +2086,101 @@
     if (!studyState) return;
     studyState.flipped = !studyState.flipped;
     $('#flipCard').classList.toggle('flipped', studyState.flipped);
+    if (studyState.flipped) {
+      $('#studyGrades').style.display = 'flex';
+      $('#studyHint').style.display = 'none';
+    } else {
+      $('#studyGrades').style.display = 'none';
+      $('#studyHint').style.display = 'block';
+    }
   }
 
-  function nextStudyCard() {
-    if (!studyState) return;
-    if (studyState.idx + 1 >= studyState.cards.length) {
+  function gradeStudyCard(rating) {
+    if (!studyState || !studyState.flipped) return;
+    const card = studyState.cards[studyState.idx];
+    const w = state.words.find(x => x.id === card.word.id);
+    if (w) {
+      w.srs = updateSrs(w.srs || defaultSrs(), rating);
+      if (rating === 'again') {
+        w.wrong = (w.wrong || 0) + 1;
+        studyState.counts.again++;
+      } else {
+        w.correct = (w.correct || 0) + 1;
+        if (rating === 'good') studyState.counts.good++;
+        else if (rating === 'hard') studyState.counts.hard++;
+      }
+    }
+    save();
+
+    studyState.idx++;
+    if (studyState.idx >= studyState.cards.length) {
       finishStudy();
       return;
     }
-    studyState.idx++;
-    showStudyCard();
-  }
-
-  function prevStudyCard() {
-    if (!studyState) return;
-    if (studyState.idx === 0) return;
-    studyState.idx--;
     showStudyCard();
   }
 
   function finishStudy() {
+    if (!studyState) return;
+    const c = studyState.counts;
+    const total = c.good + c.hard + c.again;
+
     $('#studyView').style.display = 'none';
     $('#studyDone').style.display = 'block';
+
+    $('#studyBreakdown').innerHTML = `
+      <div class="study-stat-row">
+        <span class="study-stat-label">잘 앎</span>
+        <span class="study-stat-value" style="color:var(--good);">${c.good}</span>
+      </div>
+      <div class="study-stat-row">
+        <span class="study-stat-label">애매함</span>
+        <span class="study-stat-value" style="color:var(--ochre);">${c.hard}</span>
+      </div>
+      <div class="study-stat-row">
+        <span class="study-stat-label">모름</span>
+        <span class="study-stat-value" style="color:var(--bad);">${c.again}</span>
+      </div>
+      <div class="study-stat-total">총 ${total}개 복습</div>
+    `;
+
+    const ratio = total > 0 ? c.good / total : 0;
+    let label;
+    if (total === 0) label = '시작 전이야';
+    else if (ratio === 1) label = '¡Perfecto! 완벽해';
+    else if (ratio >= 0.7) label = 'Muy bien · 잘했어';
+    else if (ratio >= 0.4) label = 'Sigue así · 계속 가자';
+    else label = 'Otra vez · 다시 한 번';
+    $('#studyDoneLabel').textContent = label;
+
     studyState = null;
   }
 
   $('#btnStartStudy').addEventListener('click', startStudy);
-  $('#btnPrevStudy').addEventListener('click', prevStudyCard);
-  $('#btnNextStudy').addEventListener('click', nextStudyCard);
+  $('#btnStudyEnd').addEventListener('click', () => {
+    if (!studyState) { resetStudyView(); return; }
+    const total = studyState.counts.good + studyState.counts.hard + studyState.counts.again;
+    if (total > 0) finishStudy();
+    else resetStudyView();
+  });
   $('#btnStudyRestart').addEventListener('click', resetStudyView);
   $('#flipCard').addEventListener('click', flipStudyCard);
 
-  // Keyboard shortcuts (active only when on study view)
+  // Keyboard shortcuts (active when on study view)
   document.addEventListener('keydown', e => {
     if (!studyState) return;
     if (!$('#panel-study').classList.contains('active')) return;
     if ($('#studyView').style.display === 'none') return;
-    // Don't intercept if typing in an input
     const t = e.target;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+
     if (e.key === ' ') { e.preventDefault(); flipStudyCard(); }
-    else if (e.key === 'ArrowRight') { e.preventDefault(); nextStudyCard(); }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); prevStudyCard(); }
+    else if (studyState.flipped) {
+      if (e.key === '1') { e.preventDefault(); gradeStudyCard('again'); }
+      else if (e.key === '2') { e.preventDefault(); gradeStudyCard('hard'); }
+      else if (e.key === '3') { e.preventDefault(); gradeStudyCard('good'); }
+    }
   });
-
-  // ===== Quiz =====
-  let quizDir = 't2m';
-  let quizN = 10;
-
-  $$('#dirOpts .opt').forEach(o => {
-    o.addEventListener('click', () => {
-      $$('#dirOpts .opt').forEach(x => x.classList.remove('active'));
-      o.classList.add('active');
-      quizDir = o.dataset.dir;
-    });
-  });
-  $$('#countOpts .opt').forEach(o => {
-    o.addEventListener('click', () => {
-      $$('#countOpts .opt').forEach(x => x.classList.remove('active'));
-      o.classList.add('active');
-      quizN = o.dataset.n === 'all' ? 'all' : parseInt(o.dataset.n);
-    });
-  });
-
-  function renderQuizDeckSelector() {
-    const container = $('#quizDeckOpts');
-    container.innerHTML = state.decks.map(d => {
-      const n = wordsInDeck(d.id).length;
-      const sel = quizSelectedDecks.has(d.id);
-      return `<button class="opt ${sel ? 'active' : ''}" data-deck-quiz="${d.id}">
-        ${escapeHtml(d.name)}<span class="quiz-deck-count">${n}</span>
-      </button>`;
-    }).join('');
-    container.querySelectorAll('[data-deck-quiz]').forEach(b => {
-      b.addEventListener('click', () => {
-        const id = b.dataset.deckQuiz;
-        if (quizSelectedDecks.has(id)) {
-          if (quizSelectedDecks.size > 1) quizSelectedDecks.delete(id);
-        } else {
-          quizSelectedDecks.add(id);
-        }
-        renderQuizDeckSelector();
-      });
-    });
-  }
-
-  function resetQuizView() {
-    $('#quizSetup').style.display = 'block';
-    $('#quizCard').style.display = 'none';
-    $('#quizResult').style.display = 'none';
-    const validIds = new Set(state.decks.map(d => d.id));
-    quizSelectedDecks = new Set([...quizSelectedDecks].filter(id => validIds.has(id)));
-    if (quizSelectedDecks.size === 0) quizSelectedDecks.add(state.currentDeckId);
-    renderQuizDeckSelector();
-  }
-
-  $('#btnStartQuiz').addEventListener('click', () => {
-    if (quizSelectedDecks.size === 0) { toast('단어장을 하나 이상 선택해줘'); return; }
-    const wordsPool = state.words.filter(w => quizSelectedDecks.has(w.deckId));
-    if (wordsPool.length === 0) { toast('선택한 단어장에 단어가 없어'); return; }
-
-    let cards = buildCards(wordsPool, quizDir);
-    if (cards.length === 0) {
-      if (quizDir === 'blank') toast('예문 안에 단어가 들어간 게 없어');
-      else toast('출제할 카드가 없어');
-      return;
-    }
-
-    // SRS priority sort
-    const now = Date.now();
-    cards.forEach(c => {
-      const srs = getCardSrs(c) || defaultSrs();
-      c._priority = (now - srs.due) / DAY_MS + Math.random() * 0.3;
-    });
-    cards.sort((a, b) => b._priority - a._priority);
-
-    const total = quizN === 'all' ? cards.length : Math.min(quizN, cards.length);
-    cards = cards.slice(0, total);
-
-    state.quiz = { cards, idx: 0, correct: 0, missed: [] };
-    $('#quizSetup').style.display = 'none';
-    $('#quizCard').style.display = 'block';
-    $('#quizResult').style.display = 'none';
-    showQuestion();
-  });
-
-  function kindLabel(card) {
-    return card.dir === 't2m' ? '단어 → 뜻' : '뜻 → 단어';
-  }
-
-  function showQuestion() {
-    const card = state.quiz.cards[state.quiz.idx];
-    $('#quizProgress').textContent = `${state.quiz.idx + 1} / ${state.quiz.cards.length}`;
-    $('#quizKind').textContent = kindLabel(card);
-
-    const qEl = $('#quizQuestion');
-    const hintEl = $('#quizHint');
-    qEl.classList.remove('is-sentence');
-    $('#quizAnswer').style.display = 'none';
-
-    const w = card.word;
-    const deckLang = getDeckLang(w.deckId);
-    const isT2M = card.dir === 't2m';
-    const question = isT2M ? w.term : w.meaning;
-
-    qEl.innerHTML = escapeHtml(question);
-    if (isT2M) {
-      const btn = document.createElement('button');
-      btn.className = 'speak-btn';
-      btn.title = '발음';
-      btn.textContent = '♪';
-      btn.type = 'button';
-      btn.addEventListener('click', () => speak(w.term, deckLang));
-      qEl.appendChild(btn);
-    }
-    hintEl.textContent = isT2M ? '뜻을 입력해줘' : '단어를 입력해줘';
-
-    $('#quizControls').innerHTML = `
-      <div class="quiz-blank-input-row">
-        <input type="text" id="answerInput" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="${isT2M ? '뜻...' : 'palabra...'}">
-        <button class="btn" id="btnCheck" type="button">확인</button>
-      </div>`;
-    const inp = $('#answerInput');
-    setTimeout(() => inp.focus(), 50);
-    inp.addEventListener('keydown', ev => {
-      if (ev.key === 'Enter') { ev.preventDefault(); checkAnswer(); }
-    });
-    $('#btnCheck').addEventListener('click', checkAnswer);
-  }
-
-  function renderGradeButtons() {
-    const card = state.quiz.cards[state.quiz.idx];
-    const srs = getCardSrs(card) || defaultSrs();
-    const wrap = $('#quizControls');
-    wrap.innerHTML = `
-      <div class="grade-row">
-        <button class="btn-grade btn-again" data-rating="again">다시<span class="interval">${previewInterval(srs, 'again')}</span></button>
-        <button class="btn-grade btn-hard" data-rating="hard">어려움<span class="interval">${previewInterval(srs, 'hard')}</span></button>
-        <button class="btn-grade btn-good" data-rating="good">좋음<span class="interval">${previewInterval(srs, 'good')}</span></button>
-        <button class="btn-grade btn-easy" data-rating="easy">쉬움<span class="interval">${previewInterval(srs, 'easy')}</span></button>
-      </div>`;
-    wrap.querySelectorAll('[data-rating]').forEach(b => {
-      b.addEventListener('click', () => grade(b.dataset.rating));
-    });
-  }
-
-  function checkAnswer() {
-    const input = $('#answerInput');
-    if (!input) return;
-    const userAns = input.value.trim();
-
-    const card = state.quiz.cards[state.quiz.idx];
-    const w = card.word;
-    const deckLang = getDeckLang(w.deckId);
-    const isT2M = card.dir === 't2m';
-    const correctAns = isT2M ? w.meaning : w.term;
-    const isCorrect = userAns ? checkAnswerMatch(userAns, correctAns) : false;
-
-    const a = $('#quizAnswer');
-    let feedback;
-    if (isCorrect) {
-      feedback = `<span class="quiz-feedback correct">✓ ${escapeHtml(correctAns)}`;
-      if (!isT2M) feedback += ` <button class="speak-btn-tiny" data-speak-correct type="button">♪</button>`;
-      feedback += `</span>`;
-    } else if (userAns) {
-      feedback = `<span class="quiz-feedback wrong"><span class="user-ans">${escapeHtml(userAns)}</span><span class="arrow">→</span><span class="correct-ans">${escapeHtml(correctAns)}</span>`;
-      if (!isT2M) feedback += ` <button class="speak-btn-tiny" data-speak-correct type="button">♪</button>`;
-      feedback += `</span>`;
-    } else {
-      // Empty input — reveal answer only, no user-ans line
-      feedback = `<span class="quiz-feedback wrong">✗ <span class="correct-ans">${escapeHtml(correctAns)}</span>`;
-      if (!isT2M) feedback += ` <button class="speak-btn-tiny" data-speak-correct type="button">♪</button>`;
-      feedback += `</span>`;
-    }
-
-    // Show first example as context
-    let sub = '';
-    const ex = (w.examples || [])[0];
-    if (ex) {
-      sub = `<button class="speak-btn-tiny" data-speak-ex type="button">♪</button> ${escapeHtml(ex.text)}`;
-      if (ex.meaning) sub += `<br><span style="font-style:normal;font-size:12px;">${escapeHtml(ex.meaning)}</span>`;
-    }
-    a.innerHTML = feedback + (sub ? `<span class="note">${sub}</span>` : '');
-    a.style.display = 'block';
-
-    if (!isT2M) {
-      const cb = a.querySelector('[data-speak-correct]');
-      if (cb) cb.addEventListener('click', () => speak(w.term, deckLang));
-    }
-    if (ex) {
-      const eb = a.querySelector('[data-speak-ex]');
-      if (eb) eb.addEventListener('click', () => speak(ex.text, deckLang));
-    }
-
-    renderGradeButtons();
-    const suggested = isCorrect ? 'good' : 'again';
-    setTimeout(() => {
-      const btn = $('#quizControls').querySelector(`[data-rating="${suggested}"]`);
-      if (btn) btn.focus();
-    }, 50);
-  }
-
-  function grade(rating) {
-    const card = state.quiz.cards[state.quiz.idx];
-    const isWrong = rating === 'again';
-
-    const oldSrs = getCardSrs(card) || defaultSrs();
-    setCardSrs(card, updateSrs(oldSrs, rating));
-
-    const w = state.words.find(x => x.id === card.word.id);
-    if (w) {
-      if (isWrong) w.wrong = (w.wrong || 0) + 1;
-      else w.correct = (w.correct || 0) + 1;
-    }
-
-    if (isWrong) state.quiz.missed.push(card);
-    else state.quiz.correct++;
-
-    save();
-    state.quiz.idx++;
-    if (state.quiz.idx >= state.quiz.cards.length) finishQuiz();
-    else showQuestion();
-  }
-
-  function finishQuiz() {
-    $('#quizCard').style.display = 'none';
-    $('#quizResult').style.display = 'block';
-
-    const total = state.quiz.cards.length;
-    const correct = state.quiz.correct;
-    const ratio = correct / total;
-    $('#resCorrect').textContent = correct;
-    $('#resTotal').textContent = total;
-
-    let label;
-    if (ratio === 1) label = '¡Perfecto! 완벽해';
-    else if (ratio >= 0.8) label = 'Muy bien · 훌륭해';
-    else if (ratio >= 0.6) label = 'Bien · 나쁘지 않아';
-    else if (ratio >= 0.3) label = 'Otra vez · 다시 한 번';
-    else label = 'Despacio · 천천히, 다시';
-    $('#resLabel').textContent = label;
-
-    if (state.quiz.missed.length > 0) {
-      $('#resMissed').style.display = 'block';
-      $('#resMissedList').innerHTML = state.quiz.missed.map(card => {
-        const dirLabel = card.dir === 't2m' ? '단어 → 뜻' : '뜻 → 단어';
-        return `<div class="result-missed-item">
-          <div class="ctx">${dirLabel}</div>
-          <div class="t">${escapeHtml(card.word.term)}</div>
-          <div class="m">${escapeHtml(card.word.meaning)}</div>
-        </div>`;
-      }).join('');
-    } else {
-      $('#resMissed').style.display = 'none';
-    }
-
-    state.quiz = null;
-  }
-
-  $('#btnRestart').addEventListener('click', resetQuizView);
 
   // ===== Export / Import =====
   $('#btnExport').addEventListener('click', () => {
@@ -2770,7 +2266,7 @@
       state.decks = [];
       state.words = [];
       state.currentDeckId = null;
-      quizSelectedDecks = new Set();
+      studySelectedDecks = new Set();
       ensureValidDeckState();
       save();
       renderDeckBar();
