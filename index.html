@@ -228,6 +228,108 @@
     user-select: none;
   }
 
+  /* Tree picker (study deck/chapter selection) */
+  .picker {
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--paper-2);
+  }
+  .picker-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    padding: 12px 14px;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .picker-label { flex: 1; }
+  .picker-summary {
+    color: var(--ink-faint);
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-style: italic;
+    font-size: 12px;
+    margin-right: 4px;
+  }
+  .picker-arrow {
+    color: var(--ink-faint);
+    font-size: 10px;
+    transition: transform 0.15s;
+    display: inline-block;
+  }
+  .picker.open .picker-arrow {
+    transform: rotate(180deg);
+  }
+  .picker-body {
+    border-top: 1px solid var(--rule);
+    padding: 6px 0;
+    max-height: 360px;
+    overflow-y: auto;
+    background: var(--paper);
+  }
+  .picker-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .picker-row:hover { background: var(--paper-2); }
+  .picker-row.deck-row .picker-row-name {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .picker-row.chapter-row {
+    padding-left: 38px;
+    font-size: 13px;
+  }
+  .picker-row.chapter-row .picker-row-name {
+    color: var(--ink-soft);
+  }
+  .picker-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--ink-faint);
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 700;
+    color: transparent;
+    transition: all 0.12s;
+  }
+  .picker-checkbox.checked,
+  .picker-checkbox.partial {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .picker-checkbox.partial { opacity: 0.65; }
+  .picker-row-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
+  }
+  .picker-row-count {
+    color: var(--ink-faint);
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-style: italic;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
   /* ===== Tabs ===== */
   nav.tabs {
     display: flex;
@@ -1084,8 +1186,15 @@
     <div id="studySetup" class="quiz-setup">
       <h3>공부 설정</h3>
       <div class="field">
-        <label>단어장 <span style="font-style:normal;font-size:11px;color:var(--ink-faint);">(여러 개 선택 가능)</span></label>
-        <div class="opt-row" id="studyDeckOpts"></div>
+        <label>단어장 / 챕터 선택</label>
+        <div class="picker" id="studyPicker">
+          <button class="picker-header" type="button" id="studyPickerHeader">
+            <span class="picker-label">전체 선택</span>
+            <span class="picker-summary" id="studyPickerSummary">—</span>
+            <span class="picker-arrow">▾</span>
+          </button>
+          <div class="picker-body" id="studyPickerBody" style="display:none;"></div>
+        </div>
       </div>
       <div class="field">
         <label>방향</label>
@@ -2518,9 +2627,10 @@
     if (!confirm(msg)) return;
     // Collect word ids that will be removed, to clean orphan progress
     const removedWordIds = state.words.filter(w => w.deckId === deckId).map(w => w.id);
+    // Remove this deck's chapter ids from study selection
+    (deck.chapters || []).forEach(c => studySelectedChapters.delete(c.id));
     state.decks = state.decks.filter(d => d.id !== deckId);
     state.words = state.words.filter(w => w.deckId !== deckId);
-    studySelectedDecks.delete(deckId);
     removedWordIds.forEach(id => delete state.progress[id]);
     if (state.currentDeckId === deckId) {
       if (state.decks.length > 0) {
@@ -2604,6 +2714,7 @@
       : `"${chapter.name}" 챕터를 삭제할까?`;
     if (!confirm(msg)) return;
     const removedWordIds = state.words.filter(w => w.chapterId === chapterId).map(w => w.id);
+    studySelectedChapters.delete(chapterId);
     deck.chapters = deck.chapters.filter(c => c.id !== chapterId);
     state.words = state.words.filter(w => w.chapterId !== chapterId);
     removedWordIds.forEach(id => delete state.progress[id]);
@@ -2869,7 +2980,7 @@
   // ===== Meta =====
   function updateMeta() {
     const all = state.words.length;
-    $('#countList').textContent = all;
+    $('#countList').textContent = state.decks.length;
     if (all === 0) $('#meta').textContent = '시작해보자';
     else if (state.decks.length === 1) $('#meta').textContent = `${all} palabras`;
     else $('#meta').textContent = `전체 ${all} · ${state.decks.length}개 단어장`;
@@ -2952,7 +3063,7 @@
   // ===== Study (flashcards with SRS grading) =====
   let studyState = null;
   let studyDir = 't2m';
-  let studySelectedDecks = new Set();
+  let studySelectedChapters = new Set();  // set of chapter IDs
 
   $$('#studyDirOpts .opt').forEach(o => {
     o.addEventListener('click', () => {
@@ -2962,27 +3073,89 @@
     });
   });
 
-  function renderStudyDeckSelector() {
-    const container = $('#studyDeckOpts');
-    container.innerHTML = state.decks.map(d => {
-      const n = wordsInDeck(d.id).length;
-      const sel = studySelectedDecks.has(d.id);
-      return `<button class="opt ${sel ? 'active' : ''}" data-deck-study="${d.id}">
-        ${escapeHtml(d.name)}<span class="quiz-deck-count">${n}</span>
-      </button>`;
-    }).join('');
-    container.querySelectorAll('[data-deck-study]').forEach(b => {
-      b.addEventListener('click', () => {
-        const id = b.dataset.deckStudy;
-        if (studySelectedDecks.has(id)) {
-          if (studySelectedDecks.size > 1) studySelectedDecks.delete(id);
-        } else {
-          studySelectedDecks.add(id);
-        }
-        renderStudyDeckSelector();
+  // ----- Tree picker helpers -----
+  function deckChapterIds(deck) {
+    return (deck.chapters || []).map(c => c.id);
+  }
+  function isDeckFullySelected(deck) {
+    const ids = deckChapterIds(deck);
+    return ids.length > 0 && ids.every(id => studySelectedChapters.has(id));
+  }
+  function isDeckPartiallySelected(deck) {
+    const ids = deckChapterIds(deck);
+    return ids.some(id => studySelectedChapters.has(id)) && !ids.every(id => studySelectedChapters.has(id));
+  }
+  function toggleDeckSelection(deck) {
+    const ids = deckChapterIds(deck);
+    if (isDeckFullySelected(deck)) {
+      ids.forEach(id => studySelectedChapters.delete(id));
+    } else {
+      ids.forEach(id => studySelectedChapters.add(id));
+    }
+  }
+  function toggleChapterSelection(chapterId) {
+    if (studySelectedChapters.has(chapterId)) studySelectedChapters.delete(chapterId);
+    else studySelectedChapters.add(chapterId);
+  }
+  function renderStudyPicker() {
+    const body = $('#studyPickerBody');
+    const summary = $('#studyPickerSummary');
+    const rows = [];
+    for (const d of state.decks) {
+      const dFull = isDeckFullySelected(d);
+      const dPart = isDeckPartiallySelected(d);
+      const cls = dFull ? 'checked' : (dPart ? 'partial' : '');
+      const icon = dFull ? '✓' : (dPart ? '−' : '');
+      const chCount = (d.chapters || []).length;
+      rows.push(`<div class="picker-row deck-row" data-deck-id="${d.id}">
+        <span class="picker-checkbox ${cls}">${icon}</span>
+        <span class="picker-row-name">${escapeHtml(d.name)}</span>
+        <span class="picker-row-count">${chCount}장</span>
+      </div>`);
+      for (const c of (d.chapters || [])) {
+        const cSel = studySelectedChapters.has(c.id);
+        const cIcon = cSel ? '✓' : '';
+        const cCls = cSel ? 'checked' : '';
+        const wCount = state.words.filter(w => w.chapterId === c.id).length;
+        rows.push(`<div class="picker-row chapter-row" data-chapter-id="${c.id}">
+          <span class="picker-checkbox ${cCls}">${cIcon}</span>
+          <span class="picker-row-name">${escapeHtml(c.name)}</span>
+          <span class="picker-row-count">${wCount}</span>
+        </div>`);
+      }
+    }
+    body.innerHTML = rows.join('') || `<div style="padding:14px;text-align:center;color:var(--ink-faint);font-size:13px;">단어장이 없어</div>`;
+
+    // Wire row clicks
+    body.querySelectorAll('[data-deck-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        const d = state.decks.find(x => x.id === el.dataset.deckId);
+        if (!d) return;
+        toggleDeckSelection(d);
+        renderStudyPicker();
       });
     });
+    body.querySelectorAll('[data-chapter-id]').forEach(el => {
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        toggleChapterSelection(el.dataset.chapterId);
+        renderStudyPicker();
+      });
+    });
+
+    // Summary count
+    const wordCount = state.words.filter(w => studySelectedChapters.has(w.chapterId)).length;
+    const chCount = studySelectedChapters.size;
+    summary.textContent = chCount === 0 ? '선택 없음' : `${chCount}개 챕터 · ${wordCount}단어`;
   }
+
+  // Picker header toggles expand/collapse
+  $('#studyPickerHeader').addEventListener('click', () => {
+    const p = $('#studyPicker');
+    const body = $('#studyPickerBody');
+    const isOpen = p.classList.toggle('open');
+    body.style.display = isOpen ? 'block' : 'none';
+  });
 
   function resetStudyView() {
     $('#studySetup').style.display = 'block';
@@ -2990,16 +3163,27 @@
     $('#studyDone').style.display = 'none';
     studyState = null;
 
-    const validIds = new Set(state.decks.map(d => d.id));
-    studySelectedDecks = new Set([...studySelectedDecks].filter(id => validIds.has(id)));
-    if (studySelectedDecks.size === 0) studySelectedDecks.add(state.currentDeckId);
-    renderStudyDeckSelector();
+    // Clean up invalid chapter ids (in case deck/chapter was deleted elsewhere)
+    const validChapterIds = new Set();
+    state.decks.forEach(d => (d.chapters || []).forEach(c => validChapterIds.add(c.id)));
+    studySelectedChapters = new Set([...studySelectedChapters].filter(id => validChapterIds.has(id)));
+
+    // Default: select all chapters of current deck if nothing selected
+    if (studySelectedChapters.size === 0) {
+      const cd = state.decks.find(d => d.id === state.currentDeckId);
+      if (cd) (cd.chapters || []).forEach(c => studySelectedChapters.add(c.id));
+    }
+    renderStudyPicker();
+
+    // Collapse the picker by default each time
+    $('#studyPicker').classList.remove('open');
+    $('#studyPickerBody').style.display = 'none';
   }
 
   function startStudy() {
-    if (studySelectedDecks.size === 0) { toast('단어장을 하나 이상 선택해줘'); return; }
-    const pool = state.words.filter(w => studySelectedDecks.has(w.deckId));
-    if (pool.length === 0) { toast('선택한 단어장에 단어가 없어'); return; }
+    if (studySelectedChapters.size === 0) { toast('단어장이나 챕터를 선택해줘'); return; }
+    const pool = state.words.filter(w => studySelectedChapters.has(w.chapterId));
+    if (pool.length === 0) { toast('선택한 곳에 단어가 없어'); return; }
 
     // Sort by SRS priority (most overdue first), with small jitter for variety
     const now = Date.now();
