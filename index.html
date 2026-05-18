@@ -708,6 +708,20 @@
     color: var(--ink);
     padding: 8px 0;
   }
+  .admin-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--paper);
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-left: 8px;
+    letter-spacing: 0.05em;
+    vertical-align: middle;
+  }
   .settings-input-row {
     display: flex;
     gap: 8px;
@@ -1143,13 +1157,20 @@
   </div>
 </div>
 
+<!-- Deck-password gate overlay (after Supabase auth) -->
+<div class="auth-overlay" id="deckGateOverlay" style="display:none;">
+  <div class="auth-card" id="deckGateCard">
+    <!-- dynamic content -->
+  </div>
+</div>
+
 <!-- Settings modal -->
 <div class="modal-overlay" id="settingsOverlay" style="display:none;">
   <div class="modal">
     <h3>계정 설정</h3>
 
     <div class="field">
-      <label>현재 아이디</label>
+      <label>현재 아이디 <span id="adminBadge" class="admin-badge" style="display:none;">관리자</span></label>
       <div class="settings-value" id="settingsUsername">—</div>
     </div>
 
@@ -1166,6 +1187,14 @@
       <div class="settings-input-row">
         <input type="password" id="newPassword" placeholder="새 비밀번호 (6자 이상)" autocomplete="new-password" maxlength="64">
         <button class="btn-tiny" id="btnSavePassword" type="button">변경</button>
+      </div>
+    </div>
+
+    <div class="field" id="adminDeckPwdSection" style="display:none;">
+      <label>단어장 비밀번호 변경 (관리자)</label>
+      <div class="settings-input-row">
+        <input type="password" id="newDeckPassword" placeholder="새 단어장 비밀번호 (6자 이상)" autocomplete="off" maxlength="64">
+        <button class="btn-tiny" id="btnSaveDeckPassword" type="button">변경</button>
       </div>
     </div>
 
@@ -1206,8 +1235,24 @@
     currentChapterId: null,
     // Local sync timestamps
     lastSharedSyncedAt: 0,
-    lastProgressSyncedAt: 0
+    lastProgressSyncedAt: 0,
+    // Admin / gate
+    isAdmin: false,
+    appSettings: null        // { admin_user_id, deck_password_hash, deck_password_salt }
   };
+
+  const APP_SETTINGS_CACHE_KEY = 'vocab.appSettings';
+  const DECK_GATE_SESSION_KEY = 'vocab.deckGate';
+
+  function hasSessionDeckAccess() {
+    return sessionStorage.getItem(DECK_GATE_SESSION_KEY) === '1';
+  }
+  function setSessionDeckAccess() {
+    sessionStorage.setItem(DECK_GATE_SESSION_KEY, '1');
+  }
+  function clearSessionDeckAccess() {
+    sessionStorage.removeItem(DECK_GATE_SESSION_KEY);
+  }
 
   // ===== Helpers =====
   function $(s) { return document.querySelector(s); }
@@ -1277,6 +1322,36 @@
     if (m.includes('already') || m.includes('exists')) return '이미 사용 중인 아이디';
     if (m.includes('password')) return '비밀번호 조건 불충족';
     return '변경 실패';
+  }
+
+  // ===== Crypto (deck-password hashing, client-side PBKDF2) =====
+  function b64encode(bytes) {
+    let s = '';
+    for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    return btoa(s);
+  }
+  function b64decode(s) {
+    const bin = atob(s);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  function generateSalt() {
+    const arr = new Uint8Array(16);
+    crypto.getRandomValues(arr);
+    return b64encode(arr);
+  }
+  async function hashWithSalt(password, saltB64) {
+    const enc = new TextEncoder();
+    const salt = b64decode(saltB64);
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
+    );
+    const bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' },
+      keyMaterial, 256
+    );
+    return b64encode(new Uint8Array(bits));
   }
 
   // ===== SRS =====
@@ -1868,10 +1943,150 @@
       await pushShared(true);
       await pushProgress(true);
     } catch (e) { /* ignore — local copy still has the data */ }
+    clearSessionDeckAccess();
     try { await sb.auth.signOut(); } catch (e) { /* ignore */ }
     currentUser = null;
+    state.isAdmin = false;
+    state.appSettings = null;
     setSyncStatus('offline');
+    hideDeckGate();
     showAuthOverlay();
+  }
+
+  // ----- App settings (admin + deck password) -----
+  async function fetchAppSettings() {
+    if (navigator.onLine) {
+      try {
+        const { data, error } = await sb.from('app_settings').select('*').eq('id', 1).maybeSingle();
+        if (!error && data) {
+          // Cache for offline use (only the public fields — hash and salt are needed for offline verify)
+          localStorage.setItem(APP_SETTINGS_CACHE_KEY, JSON.stringify(data));
+          return data;
+        }
+      } catch (e) { /* fall through to cached */ }
+    }
+    try {
+      const cached = localStorage.getItem(APP_SETTINGS_CACHE_KEY);
+      return cached ? JSON.parse(cached) : null;
+    } catch (e) { return null; }
+  }
+
+  // ----- Deck-password gate -----
+  function showDeckGate(mode) {
+    const overlay = $('#deckGateOverlay');
+    const card = $('#deckGateCard');
+    if (mode === 'set') {
+      card.innerHTML = `
+        <h2>Vocabulario<span class="dot">.</span></h2>
+        <div class="auth-sub">단어장 비밀번호 설정 (관리자)</div>
+        <div class="field">
+          <input type="password" id="deckPwdSet1" placeholder="새 단어장 비밀번호 (6자 이상)" autocomplete="off" maxlength="64">
+        </div>
+        <div class="field">
+          <input type="password" id="deckPwdSet2" placeholder="다시 입력" autocomplete="off" maxlength="64">
+        </div>
+        <div class="auth-error" id="deckGateError"></div>
+        <div class="auth-actions">
+          <button class="btn btn-ghost" id="btnDeckGateLogout">로그아웃</button>
+          <button class="btn" id="btnDeckGateConfirm">설정</button>
+        </div>`;
+      overlay.style.display = 'flex';
+      setTimeout(() => $('#deckPwdSet1').focus(), 10);
+      $('#btnDeckGateConfirm').addEventListener('click', handleSetDeckPassword);
+      $('#btnDeckGateLogout').addEventListener('click', handleLogout);
+      $('#deckPwdSet2').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); handleSetDeckPassword(); }
+      });
+    } else if (mode === 'wait') {
+      card.innerHTML = `
+        <h2>Vocabulario<span class="dot">.</span></h2>
+        <div class="auth-sub">관리자가 단어장 비밀번호를 아직 설정하지 않았어</div>
+        <div class="auth-error">관리자에게 비밀번호 설정을 요청해줘</div>
+        <div class="auth-actions">
+          <button class="btn btn-ghost" id="btnDeckGateLogout">로그아웃</button>
+          <button class="btn" id="btnDeckGateRetry">새로고침</button>
+        </div>`;
+      overlay.style.display = 'flex';
+      $('#btnDeckGateLogout').addEventListener('click', handleLogout);
+      $('#btnDeckGateRetry').addEventListener('click', () => location.reload());
+    } else {
+      // 'enter'
+      card.innerHTML = `
+        <h2>Vocabulario<span class="dot">.</span></h2>
+        <div class="auth-sub">단어장 비밀번호</div>
+        <div class="field">
+          <input type="password" id="deckPwdInput" placeholder="단어장 비밀번호" autocomplete="off" maxlength="64">
+        </div>
+        <div class="auth-error" id="deckGateError"></div>
+        <div class="auth-actions">
+          <button class="btn btn-ghost" id="btnDeckGateLogout">로그아웃</button>
+          <button class="btn" id="btnDeckGateConfirm">들어가기</button>
+        </div>`;
+      overlay.style.display = 'flex';
+      setTimeout(() => $('#deckPwdInput').focus(), 10);
+      $('#btnDeckGateConfirm').addEventListener('click', handleDeckGate);
+      $('#btnDeckGateLogout').addEventListener('click', handleLogout);
+      $('#deckPwdInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); handleDeckGate(); }
+      });
+    }
+  }
+  function hideDeckGate() { $('#deckGateOverlay').style.display = 'none'; }
+
+  async function handleSetDeckPassword() {
+    const p1 = $('#deckPwdSet1').value;
+    const p2 = $('#deckPwdSet2').value;
+    if (!p1 || p1.length < 6) { $('#deckGateError').textContent = '비밀번호는 6자 이상'; return; }
+    if (p1 !== p2) { $('#deckGateError').textContent = '두 입력이 달라'; return; }
+    try {
+      const salt = generateSalt();
+      const hash = await hashWithSalt(p1, salt);
+      const { error } = await sb.from('app_settings').update({
+        deck_password_hash: hash,
+        deck_password_salt: salt
+      }).eq('id', 1);
+      if (error) { $('#deckGateError').textContent = '저장 실패 (관리자 권한 확인 필요)'; return; }
+      // Refresh local cache
+      state.appSettings = await fetchAppSettings();
+      setSessionDeckAccess();
+      hideDeckGate();
+      await proceedAfterGate();
+      toast('단어장 비밀번호 설정됨');
+    } catch (e) {
+      $('#deckGateError').textContent = '저장 실패';
+    }
+  }
+
+  async function handleDeckGate() {
+    const input = $('#deckPwdInput').value;
+    if (!input) { $('#deckGateError').textContent = '비밀번호 입력'; return; }
+    const settings = state.appSettings;
+    if (!settings || !settings.deck_password_hash || !settings.deck_password_salt) {
+      $('#deckGateError').textContent = '설정 정보 없음';
+      return;
+    }
+    try {
+      const computed = await hashWithSalt(input, settings.deck_password_salt);
+      if (computed !== settings.deck_password_hash) {
+        $('#deckGateError').textContent = '비밀번호가 틀려';
+        return;
+      }
+      setSessionDeckAccess();
+      hideDeckGate();
+      await proceedAfterGate();
+    } catch (e) {
+      $('#deckGateError').textContent = '확인 실패';
+    }
+  }
+
+  async function proceedAfterGate() {
+    // Now safe to load local cache and pull cloud data
+    load();
+    ensureValidDeckState();
+    refreshAddLocation();
+    updateMeta();
+    await migrateFromOldUserData();
+    await syncPull();
   }
 
   // ----- One-time migration from old v1-v4 user_data table -----
@@ -1949,10 +2164,25 @@
   }
 
   async function onAuthenticated() {
-    // One-time migration (idempotent)
-    await migrateFromOldUserData();
-    // Pull both tables
-    await syncPull();
+    const settings = await fetchAppSettings();
+    state.appSettings = settings;
+    state.isAdmin = !!(settings && settings.admin_user_id === currentUser.id);
+
+    // No password set yet
+    if (!settings || !settings.deck_password_hash || !settings.deck_password_salt) {
+      if (state.isAdmin) showDeckGate('set');
+      else showDeckGate('wait');
+      return;
+    }
+
+    // Session-scoped fast path
+    if (hasSessionDeckAccess()) {
+      hideDeckGate();
+      await proceedAfterGate();
+      return;
+    }
+
+    showDeckGate('enter');
   }
 
   // ===== Settings (account) =====
@@ -1962,6 +2192,15 @@
     $('#settingsUsername').textContent = username || '—';
     $('#newUsername').value = '';
     $('#newPassword').value = '';
+    $('#newDeckPassword').value = '';
+    // Admin-only section visibility
+    if (state.isAdmin) {
+      $('#adminBadge').style.display = 'inline-block';
+      $('#adminDeckPwdSection').style.display = '';
+    } else {
+      $('#adminBadge').style.display = 'none';
+      $('#adminDeckPwdSection').style.display = 'none';
+    }
     $('#settingsOverlay').style.display = 'flex';
   }
   function hideSettings() {
@@ -1997,6 +2236,28 @@
       if (error) { toast(translateUpdateError(error.message)); return; }
       $('#newPassword').value = '';
       toast('비밀번호 변경됨');
+    } catch (e) {
+      toast('변경 실패');
+    }
+  }
+
+  async function changeDeckPassword() {
+    if (!state.isAdmin) { toast('관리자만 가능'); return; }
+    const newP = $('#newDeckPassword').value;
+    if (!newP || newP.length < 6) { toast('단어장 비밀번호는 6자 이상'); return; }
+    if (!confirm('단어장 비밀번호를 변경할까? 다른 사용자는 다음 로그인부터 새 비밀번호 필요.')) return;
+    try {
+      const salt = generateSalt();
+      const hash = await hashWithSalt(newP, salt);
+      const { error } = await sb.from('app_settings').update({
+        deck_password_hash: hash,
+        deck_password_salt: salt
+      }).eq('id', 1);
+      if (error) { toast('변경 실패 (권한 확인 필요)'); return; }
+      // Refresh local cache so this client doesn't get logged out
+      state.appSettings = await fetchAppSettings();
+      $('#newDeckPassword').value = '';
+      toast('단어장 비밀번호 변경됨');
     } catch (e) {
       toast('변경 실패');
     }
@@ -3117,6 +3378,7 @@
   $('#btnSettingsClose').addEventListener('click', hideSettings);
   $('#btnSaveUsername').addEventListener('click', changeUsername);
   $('#btnSavePassword').addEventListener('click', changePassword);
+  $('#btnSaveDeckPassword').addEventListener('click', changeDeckPassword);
   $('#settingsOverlay').addEventListener('click', e => {
     if (e.target === $('#settingsOverlay')) hideSettings();
   });
@@ -3126,11 +3388,13 @@
   $('#newPassword').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); changePassword(); }
   });
+  $('#newDeckPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); changeDeckPassword(); }
+  });
 
   // ===== Init =====
-  load();
-  ensureValidDeckState();
-  refreshAddLocation();
+  // Deliberately do NOT load() from localStorage here — wait until after auth + deck gate.
+  // This prevents cached content from being visible (via DevTools) before the gate.
   updateMeta();
 
   $('#btnSignin').addEventListener('click', handleSignin);
@@ -3143,15 +3407,17 @@
     if (e.key === 'Enter') { e.preventDefault(); $('#authPassword').focus(); }
   });
 
-  window.addEventListener('focus', () => { if (currentUser) syncPull(); });
+  window.addEventListener('focus', () => {
+    if (currentUser && hasSessionDeckAccess()) syncPull();
+  });
   window.addEventListener('resize', () => {
     if (studyState && $('#panel-study').classList.contains('active')) adjustFlipHeight();
   });
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && currentUser) syncPull();
+    if (!document.hidden && currentUser && hasSessionDeckAccess()) syncPull();
   });
   window.addEventListener('online', () => {
-    if (currentUser) { pushShared(); pushProgress(); }
+    if (currentUser && hasSessionDeckAccess()) { pushShared(); pushProgress(); }
   });
   window.addEventListener('offline', () => setSyncStatus('offline'));
 
