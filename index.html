@@ -12,23 +12,23 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    /* Olive grove + soft ivory palette */
-    --paper:      #fcfaf6;   /* very subtle ivory, near white */
-    --paper-2:    #f2eee2;   /* light cream for cards (visible against ivory) */
-    --paper-soft: #ffffff;   /* pure white for focused inputs */
-    --ink:        #3a2114;   /* deep warm brown */
-    --ink-soft:   #5e3a26;   /* medium brown */
-    --ink-faint:  #a08066;   /* faded brown */
-    --rule:       #e2dac8;   /* light sand for borders */
-    --rule-soft:  #ebe5d6;   /* lighter sand */
-    --accent:     #5d7437;   /* olive green, primary accent */
-    --accent-2:   #a3a849;   /* light olive */
-    --ochre:      #d99d2b;   /* saffron / Andalusian gold */
-    --good:       #3d5a3d;   /* forest green for correct */
-    --olive:      #8a8748;   /* muted olive */
-    --bad:        #8a3a3a;   /* deep wine, only for wrong/error */
+    /* White / black / green */
+    --paper:      #ffffff;   /* pure white background */
+    --paper-2:    #f6f7f6;   /* near-white card surface (very subtle green-tinted gray) */
+    --paper-soft: #fafafa;   /* focused inputs */
+    --ink:        #0a0a0a;   /* near-black text */
+    --ink-soft:   #404040;   /* medium gray secondary text */
+    --ink-faint:  #9a9a9a;   /* faded gray hints */
+    --rule:       #e8e8e8;   /* light gray borders */
+    --rule-soft:  #f0f0f0;   /* lighter borders */
+    --accent:     #1d8a4a;   /* primary green */
+    --accent-2:   #5fb87c;   /* lighter green */
+    --ochre:      #c08a1f;   /* warning amber (애매함) */
+    --good:       #1d8a4a;   /* green for correct (same as accent) */
+    --olive:      #2f7d40;   /* secondary green */
+    --bad:        #c0392b;   /* red for wrong/error */
 
-    --shadow: 0 1px 0 rgba(58, 33, 20, 0.04), 0 14px 42px -12px rgba(58, 33, 20, 0.12);
+    --shadow: 0 1px 0 rgba(0, 0, 0, 0.03), 0 14px 42px -12px rgba(0, 0, 0, 0.10);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -161,7 +161,7 @@
     background: var(--paper);
     border: 1px solid var(--ink-soft);
     border-radius: 3px;
-    box-shadow: 0 12px 32px rgba(58, 33, 20, 0.22);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
     padding: 4px;
     z-index: 100;
     min-width: 160px;
@@ -197,6 +197,7 @@
   }
   .location-row select {
     flex: 1;
+    min-width: 0;
     background: var(--paper-2);
     border: 1px solid var(--rule);
     border-radius: 2px;
@@ -212,6 +213,9 @@
     background-size: 5px 5px;
     background-repeat: no-repeat;
     padding-right: 28px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
   .location-row select:focus {
     outline: none;
@@ -676,7 +680,7 @@
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(58, 33, 20, 0.4);
+    background: rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -688,7 +692,7 @@
     background: var(--paper);
     border: 1px solid var(--rule);
     border-radius: 3px;
-    box-shadow: 0 24px 60px rgba(58, 33, 20, 0.3);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
     width: 100%;
     max-width: 580px;
     max-height: calc(100vh - 40px);
@@ -787,9 +791,6 @@
     position: fixed;
     inset: 0;
     background: var(--paper);
-    background-image:
-      radial-gradient(circle at 20% 30%, rgba(217, 157, 43, 0.06) 0%, transparent 45%),
-      radial-gradient(circle at 80% 70%, rgba(93, 116, 55, 0.06) 0%, transparent 45%);
     z-index: 500;
     display: flex;
     align-items: center;
