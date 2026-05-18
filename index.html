@@ -702,6 +702,23 @@
     margin-bottom: 20px;
     letter-spacing: -0.01em;
   }
+  .settings-value {
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-size: 18px;
+    color: var(--ink);
+    padding: 8px 0;
+  }
+  .settings-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .settings-input-row input {
+    flex: 1;
+  }
+  .settings-input-row .btn-tiny {
+    white-space: nowrap;
+  }
 
   /* Footer */
   footer {
@@ -1097,8 +1114,9 @@
       <input type="file" id="fileInput" accept=".json" style="display:none">
     </div>
     <div class="right">
+      <button class="btn-tiny" id="btnSettings">설정</button>
       <button class="btn-tiny" id="btnLogout">로그아웃</button>
-      <button class="btn-tiny danger" id="btnReset">전체 삭제</button>
+      <button class="btn-tiny danger" id="btnReset">내 기록 초기화</button>
     </div>
   </footer>
 </div>
@@ -1112,15 +1130,47 @@
     <h2>Vocabulario<span class="dot">.</span></h2>
     <div class="auth-sub" id="authSub">시작하려면 로그인 또는 회원가입</div>
     <div class="field">
-      <input type="email" id="authEmail" placeholder="이메일" autocomplete="email">
+      <input type="text" id="authUsername" placeholder="아이디 (3-20자, 영문/숫자/_/-)" autocomplete="username" maxlength="20" spellcheck="false" autocapitalize="off">
     </div>
     <div class="field">
-      <input type="password" id="authPassword" placeholder="비밀번호 (6자 이상)" autocomplete="current-password">
+      <input type="password" id="authPassword" placeholder="비밀번호 (6자 이상)" autocomplete="current-password" maxlength="64">
     </div>
     <div class="auth-error" id="authError"></div>
     <div class="auth-actions">
       <button class="btn btn-ghost" id="btnSignup">회원가입</button>
       <button class="btn" id="btnSignin">로그인</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="settingsOverlay" style="display:none;">
+  <div class="modal">
+    <h3>계정 설정</h3>
+
+    <div class="field">
+      <label>현재 아이디</label>
+      <div class="settings-value" id="settingsUsername">—</div>
+    </div>
+
+    <div class="field">
+      <label>아이디 변경</label>
+      <div class="settings-input-row">
+        <input type="text" id="newUsername" placeholder="새 아이디" autocomplete="off" maxlength="20" spellcheck="false" autocapitalize="off">
+        <button class="btn-tiny" id="btnSaveUsername" type="button">변경</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>비밀번호 변경</label>
+      <div class="settings-input-row">
+        <input type="password" id="newPassword" placeholder="새 비밀번호 (6자 이상)" autocomplete="new-password" maxlength="64">
+        <button class="btn-tiny" id="btnSavePassword" type="button">변경</button>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top: 12px;">
+      <button class="btn btn-ghost" id="btnSettingsClose" type="button">닫기</button>
     </div>
   </div>
 </div>
@@ -1146,11 +1196,17 @@
   const OLD_KEY = 'vocab.v1';
 
   let state = {
+    // Shared content (synced to shared_data table — visible to all logged-in users)
     decks: [],
+    words: [],
+    // Per-user progress (synced to user_progress table)
+    progress: {},            // { wordId: { srs, correct, wrong } }
+    // Per-user navigation (also in user_progress)
     currentDeckId: null,
     currentChapterId: null,
-    words: [],
-    lastSyncedAt: 0
+    // Local sync timestamps
+    lastSharedSyncedAt: 0,
+    lastProgressSyncedAt: 0
   };
 
   // ===== Helpers =====
@@ -1181,6 +1237,48 @@
     return state.words.filter(w => w.deckId === deckId);
   }
 
+  // ===== Username / password validation =====
+  const USERNAME_RE = /^[a-zA-Z0-9_-]+$/;
+  function validateUsername(u) {
+    if (!u) return '아이디를 입력해줘';
+    const t = u.trim();
+    if (t.length < 3) return '아이디는 3자 이상';
+    if (t.length > 20) return '아이디는 20자 이하';
+    if (!USERNAME_RE.test(t)) return '아이디는 영문/숫자/_/- 만 가능';
+    return null;
+  }
+  function validatePassword(p) {
+    if (!p) return '비밀번호를 입력해줘';
+    if (p.length < 6) return '비밀번호는 6자 이상';
+    if (p.length > 64) return '비밀번호는 64자 이하';
+    return null;
+  }
+  function usernameToEmail(u) {
+    return `${u.toLowerCase().trim()}@vocab.app.local`;
+  }
+  function emailToUsername(e) {
+    if (!e) return '';
+    const at = e.indexOf('@');
+    return at > 0 ? e.slice(0, at) : e;
+  }
+  // Generic-by-design error mappers (avoid leaking whether a username exists)
+  function translateSignupError(msg) {
+    const m = (msg || '').toLowerCase();
+    if (m.includes('already') || m.includes('registered') || m.includes('exists')) return '이미 가입된 아이디';
+    if (m.includes('password')) return '비밀번호 조건 불충족';
+    return '가입 실패';
+  }
+  function translateSigninError(msg) {
+    // Always generic so we don't reveal whether the username exists
+    return '아이디 또는 비밀번호가 틀려';
+  }
+  function translateUpdateError(msg) {
+    const m = (msg || '').toLowerCase();
+    if (m.includes('already') || m.includes('exists')) return '이미 사용 중인 아이디';
+    if (m.includes('password')) return '비밀번호 조건 불충족';
+    return '변경 실패';
+  }
+
   // ===== SRS =====
   const DAY_MS = 86400000;
   function defaultSrs() {
@@ -1191,8 +1289,33 @@
   }
   function ensureWord(w) {
     if (!Array.isArray(w.examples)) w.examples = [];
-    ensureSrs(w, 'srs');
-    ensureSrs(w, 'srsBlank');
+    // Per-user fields are stripped during migration (extractProgressFromWords) and
+    // during shared-data syncs, not here — calling ensureWord on a freshly-loaded
+    // raw object should preserve those fields so progress extraction can run.
+  }
+
+  // Aggressively strip any per-user fields. Used right before pushing to shared_data
+  // and after extracting them to state.progress.
+  function stripPerUserFields(w) {
+    delete w.srs;
+    delete w.srsBlank;
+    delete w.correct;
+    delete w.wrong;
+  }
+
+  // ===== Per-user progress =====
+  function getProgress(wordId) {
+    return state.progress[wordId] || { srs: defaultSrs(), correct: 0, wrong: 0 };
+  }
+  function ensureProgress(wordId) {
+    if (!state.progress[wordId]) {
+      state.progress[wordId] = { srs: defaultSrs(), correct: 0, wrong: 0 };
+    }
+    const p = state.progress[wordId];
+    ensureSrs(p, 'srs');
+    if (typeof p.correct !== 'number') p.correct = 0;
+    if (typeof p.wrong !== 'number') p.wrong = 0;
+    return p;
   }
 
   function updateSrs(srs, rating) {
@@ -1246,27 +1369,31 @@
     return formatTime(ns.due - Date.now());
   }
 
-  function getCardSrs(card) {
-    return card.word.srs;
-  }
-  function setCardSrs(card, ns) {
-    card.word.srs = ns;
-  }
-
-  // ===== Storage / Migration =====
-  function save() {
+  // ===== Storage =====
+  // Two-table model:
+  //   - Shared:   decks + words (everyone logged in sees the same content)
+  //   - Progress: per-user SRS + correct/wrong counts + current navigation
+  // The local snapshot keeps both together so the app works offline.
+  function save() { saveShared(); }   // default = shared change (backward-compat)
+  function saveShared() {
     saveLocal();
-    if (currentUser) queuePush();
+    if (currentUser) queuePushShared();
+  }
+  function saveProgress() {
+    saveLocal();
+    if (currentUser) queuePushProgress();
   }
 
   function saveLocal() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      version: 4,
+      version: 5,
       decks: state.decks,
+      words: state.words,
+      progress: state.progress,
       currentDeckId: state.currentDeckId,
       currentChapterId: state.currentChapterId,
-      words: state.words,
-      lastSyncedAt: state.lastSyncedAt || 0
+      lastSharedSyncedAt: state.lastSharedSyncedAt || 0,
+      lastProgressSyncedAt: state.lastProgressSyncedAt || 0
     }));
     updateMeta();
   }
@@ -1381,24 +1508,76 @@
     return data;
   }
 
+  // Extract per-user fields from words into a progress map. Used when migrating from
+  // old (v1-v4) shapes where srs/correct/wrong lived on each word.
+  function extractProgressFromWords(words) {
+    const progress = {};
+    (words || []).forEach(w => {
+      const hasProgress = w.srs || (w.correct && w.correct > 0) || (w.wrong && w.wrong > 0);
+      if (hasProgress) {
+        progress[w.id] = {
+          srs: w.srs || defaultSrs(),
+          correct: w.correct || 0,
+          wrong: w.wrong || 0
+        };
+      }
+      delete w.srs;
+      delete w.srsBlank;
+      delete w.correct;
+      delete w.wrong;
+    });
+    return progress;
+  }
+
   function load() {
     try {
       const v2raw = localStorage.getItem(STORAGE_KEY);
       if (v2raw) {
-        const data = migrateData(JSON.parse(v2raw));
-        if (data) applyData(data);
-        if (data && data.version !== 4) saveLocal(); // persist migration
-        ensureValidDeckState();
+        const parsed = JSON.parse(v2raw);
+        // v5: already split
+        if (parsed && parsed.version === 5) {
+          state.decks = Array.isArray(parsed.decks) ? parsed.decks : [];
+          state.words = Array.isArray(parsed.words) ? parsed.words : [];
+          state.progress = (parsed.progress && typeof parsed.progress === 'object') ? parsed.progress : {};
+          state.currentDeckId = parsed.currentDeckId || null;
+          state.currentChapterId = parsed.currentChapterId || null;
+          state.lastSharedSyncedAt = parsed.lastSharedSyncedAt || 0;
+          state.lastProgressSyncedAt = parsed.lastProgressSyncedAt || 0;
+          state.words.forEach(ensureWord);
+          ensureValidDeckState();
+          return;
+        }
+        // v1-v4: migrate, extract progress
+        const data = migrateData(parsed);
+        if (data) {
+          state.decks = Array.isArray(data.decks) ? data.decks : [];
+          state.words = Array.isArray(data.words) ? data.words : [];
+          state.progress = extractProgressFromWords(state.words);
+          state.currentDeckId = data.currentDeckId || null;
+          state.currentChapterId = data.currentChapterId || null;
+          state.lastSharedSyncedAt = 0;
+          state.lastProgressSyncedAt = 0;
+          state.words.forEach(ensureWord);
+          ensureValidDeckState();
+          saveLocal(); // persist as v5
+        } else {
+          ensureValidDeckState();
+        }
         return;
       }
       const v1raw = localStorage.getItem(OLD_KEY);
       if (v1raw) {
         const data = migrateData(JSON.parse(v1raw));
         if (data) {
-          applyData(data);
+          state.decks = data.decks || [];
+          state.words = data.words || [];
+          state.progress = extractProgressFromWords(state.words);
+          state.currentDeckId = data.currentDeckId || null;
+          state.currentChapterId = data.currentChapterId || null;
+          state.words.forEach(ensureWord);
+          ensureValidDeckState();
           saveLocal();
         }
-        ensureValidDeckState();
         return;
       }
       ensureValidDeckState();
@@ -1408,24 +1587,30 @@
     }
   }
 
-  function applyData(data) {
+  // Apply data fetched from shared_data table (decks, words). Words come without per-user fields.
+  function applySharedData(data) {
     state.decks = Array.isArray(data.decks) ? data.decks : [];
-    state.currentDeckId = data.currentDeckId;
-    state.currentChapterId = data.currentChapterId;
     state.words = Array.isArray(data.words) ? data.words : [];
-    state.lastSyncedAt = data.lastSyncedAt || 0;
-    state.words.forEach(ensureWord);
+    state.words.forEach(w => { ensureWord(w); stripPerUserFields(w); });
+    ensureChapters({ decks: state.decks, words: state.words });
+  }
+
+  // Apply data fetched from user_progress table.
+  function applyProgressData(data) {
+    state.progress = (data.progress && typeof data.progress === 'object') ? data.progress : {};
+    if (data.currentDeckId) state.currentDeckId = data.currentDeckId;
+    if (data.currentChapterId) state.currentChapterId = data.currentChapterId;
   }
 
   function ensureValidDeckState() {
-    if (!state.decks || state.decks.length === 0) {
-      const def = { id: 'd_' + uid(), name: '기본', created: Date.now() };
-      def.chapters = [{ id: defaultChapterIdFor(def.id), name: '기본', created: Date.now() }];
-      state.decks = [def];
-      state.currentDeckId = def.id;
-      state.currentChapterId = def.chapters[0].id;
+    // For shared content: if no decks, leave empty — first user to add a deck creates it.
+    if (!Array.isArray(state.decks)) state.decks = [];
+    if (state.decks.length === 0) {
+      state.currentDeckId = null;
+      state.currentChapterId = null;
+      return;
     }
-    // Ensure every deck has chapters (idempotent safety)
+    // Ensure every deck has at least one chapter
     state.decks.forEach(d => {
       if (!Array.isArray(d.chapters) || d.chapters.length === 0) {
         d.chapters = [{ id: defaultChapterIdFor(d.id), name: '기본', created: d.created || Date.now() }];
@@ -1435,12 +1620,11 @@
     if (!state.currentDeckId || !state.decks.find(d => d.id === state.currentDeckId)) {
       state.currentDeckId = state.decks[0].id;
     }
-    // Validate currentChapterId against current deck
     const cd = state.decks.find(d => d.id === state.currentDeckId);
     if (cd && (!state.currentChapterId || !cd.chapters.find(c => c.id === state.currentChapterId))) {
       state.currentChapterId = cd.chapters[0].id;
     }
-    // Validate all word chapterIds
+    // Validate word chapterIds
     state.words.forEach(w => {
       const d = state.decks.find(x => x.id === w.deckId);
       if (!d) return;
@@ -1450,9 +1634,11 @@
     });
   }
 
-  // ===== Cloud sync =====
-  let pushTimer = null;
-  let isSyncing = false;
+  // ===== Cloud sync (two tables) =====
+  let pushSharedTimer = null;
+  let pushProgressTimer = null;
+  let isSyncingShared = false;
+  let isSyncingProgress = false;
 
   function setSyncStatus(status) {
     const el = $('#syncStatus');
@@ -1463,83 +1649,153 @@
     el.textContent = labels[status] || '';
   }
 
-  async function syncPull() {
-    if (!currentUser || isSyncing) return;
+  // ----- Shared content (decks + words) -----
+  async function pullShared() {
+    if (!currentUser || isSyncingShared) return;
     if (studyState) return;
     if (!navigator.onLine) { setSyncStatus('offline'); return; }
-    isSyncing = true;
+    isSyncingShared = true;
     setSyncStatus('syncing');
     try {
       const { data, error } = await sb
-        .from('user_data')
+        .from('shared_data')
         .select('data, updated_at')
-        .eq('user_id', currentUser.id)
+        .eq('id', 1)
         .maybeSingle();
       if (error) throw error;
-
       if (!data) {
-        await syncPush(true);
-        return;
-      }
-
-      const serverTime = new Date(data.updated_at).getTime();
-      if (serverTime > (state.lastSyncedAt || 0)) {
-        // Server is newer; migrate as needed and replace local
-        const migrated = migrateData(data.data || {});
-        if (migrated) {
-          applyData(migrated);
-          state.lastSyncedAt = serverTime;
+        // Shared table empty; nothing to pull. If we have local content, push it up.
+        if (state.decks.length > 0 || state.words.length > 0) await pushShared(true);
+      } else {
+        const serverTime = new Date(data.updated_at).getTime();
+        if (serverTime > (state.lastSharedSyncedAt || 0)) {
+          const payload = data.data || {};
+          // Run chapter validation defensively in case server has older shape
+          ensureChapters({ decks: payload.decks || [], words: payload.words || [] });
+          applySharedData(payload);
+          state.lastSharedSyncedAt = serverTime;
           ensureValidDeckState();
           saveLocal();
-          rerenderAfterSync();
-          // If it was old format we just migrated, push v3 back up
-          if (data.data && data.data.version !== 3) {
-            queuePush();
-          }
         }
       }
       setSyncStatus('synced');
     } catch (e) {
-      console.error('Pull error:', e);
+      console.error('Pull shared failed');
       setSyncStatus('error');
     } finally {
-      isSyncing = false;
+      isSyncingShared = false;
     }
   }
 
-  async function syncPush(silent) {
+  async function pushShared(silent) {
+    if (!currentUser) return;
+    if (!navigator.onLine) { setSyncStatus('offline'); return; }
+    if (!silent) setSyncStatus('syncing');
+    try {
+      // Defensive strip: in case any per-user fields leaked onto a word object,
+      // never let them reach shared_data (which is visible to everyone).
+      state.words.forEach(stripPerUserFields);
+      const { data, error } = await sb
+        .from('shared_data')
+        .upsert({
+          id: 1,
+          data: {
+            version: 5,
+            decks: state.decks,
+            words: state.words
+          }
+        }, { onConflict: 'id' })
+        .select('updated_at')
+        .single();
+      if (error) throw error;
+      state.lastSharedSyncedAt = data ? new Date(data.updated_at).getTime() : Date.now();
+      saveLocal();
+      setSyncStatus('synced');
+    } catch (e) {
+      console.error('Push shared failed');
+      setSyncStatus('error');
+    }
+  }
+
+  function queuePushShared() {
+    clearTimeout(pushSharedTimer);
+    setSyncStatus('syncing');
+    pushSharedTimer = setTimeout(() => pushShared(), 1500);
+  }
+
+  // ----- Per-user progress -----
+  async function pullProgress() {
+    if (!currentUser || isSyncingProgress) return;
+    if (studyState) return;
+    if (!navigator.onLine) { setSyncStatus('offline'); return; }
+    isSyncingProgress = true;
+    setSyncStatus('syncing');
+    try {
+      const { data, error } = await sb
+        .from('user_progress')
+        .select('data, updated_at')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) {
+        // No row yet; push current state to create one
+        await pushProgress(true);
+      } else {
+        const serverTime = new Date(data.updated_at).getTime();
+        if (serverTime > (state.lastProgressSyncedAt || 0)) {
+          applyProgressData(data.data || {});
+          state.lastProgressSyncedAt = serverTime;
+          ensureValidDeckState();
+          saveLocal();
+        }
+      }
+      setSyncStatus('synced');
+    } catch (e) {
+      console.error('Pull progress failed');
+      setSyncStatus('error');
+    } finally {
+      isSyncingProgress = false;
+    }
+  }
+
+  async function pushProgress(silent) {
     if (!currentUser) return;
     if (!navigator.onLine) { setSyncStatus('offline'); return; }
     if (!silent) setSyncStatus('syncing');
     try {
       const { data, error } = await sb
-        .from('user_data')
+        .from('user_progress')
         .upsert({
           user_id: currentUser.id,
           data: {
-            version: 4,
-            decks: state.decks,
+            version: 5,
+            progress: state.progress,
             currentDeckId: state.currentDeckId,
-            currentChapterId: state.currentChapterId,
-            words: state.words
+            currentChapterId: state.currentChapterId
           }
         }, { onConflict: 'user_id' })
         .select('updated_at')
         .single();
       if (error) throw error;
-      state.lastSyncedAt = data ? new Date(data.updated_at).getTime() : Date.now();
+      state.lastProgressSyncedAt = data ? new Date(data.updated_at).getTime() : Date.now();
       saveLocal();
       setSyncStatus('synced');
     } catch (e) {
-      console.error('Push error:', e);
+      console.error('Push progress failed');
       setSyncStatus('error');
     }
   }
 
-  function queuePush() {
-    clearTimeout(pushTimer);
+  function queuePushProgress() {
+    clearTimeout(pushProgressTimer);
     setSyncStatus('syncing');
-    pushTimer = setTimeout(() => syncPush(), 1500);
+    pushProgressTimer = setTimeout(() => pushProgress(), 1500);
+  }
+
+  async function syncPull() {
+    await pullShared();
+    await pullProgress();
+    rerenderAfterSync();
   }
 
   function rerenderAfterSync() {
@@ -1553,53 +1809,197 @@
   function showAuthOverlay() {
     $('#authOverlay').style.display = 'flex';
     $('#authError').textContent = '';
-    $('#authEmail').value = '';
+    $('#authUsername').value = '';
     $('#authPassword').value = '';
   }
   function hideAuthOverlay() { $('#authOverlay').style.display = 'none'; }
 
-  async function handleSignin() {
-    const email = $('#authEmail').value.trim();
-    const password = $('#authPassword').value;
-    if (!email || !password) { $('#authError').textContent = '이메일과 비밀번호를 입력해줘'; return; }
-    $('#authError').textContent = '';
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) { $('#authError').textContent = '로그인 실패: ' + error.message; return; }
-    currentUser = data.user;
-    hideAuthOverlay();
-    await onAuthenticated();
-  }
+  function showAuthError(msg) { $('#authError').textContent = msg || ''; }
 
-  async function handleSignup() {
-    const email = $('#authEmail').value.trim();
-    const password = $('#authPassword').value;
-    if (!email || !password) { $('#authError').textContent = '이메일과 비밀번호를 입력해줘'; return; }
-    if (password.length < 6) { $('#authError').textContent = '비밀번호는 6자 이상'; return; }
-    $('#authError').textContent = '';
-    const { data, error } = await sb.auth.signUp({ email, password });
-    if (error) { $('#authError').textContent = '회원가입 실패: ' + error.message; return; }
-    if (data.session) {
+  async function handleSignin() {
+    const u = $('#authUsername').value.trim();
+    const p = $('#authPassword').value;
+    const uErr = validateUsername(u);
+    if (uErr) { showAuthError(uErr); return; }
+    const pErr = validatePassword(p);
+    if (pErr) { showAuthError(pErr); return; }
+    showAuthError('');
+    const email = usernameToEmail(u);
+    try {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: p });
+      if (error) { showAuthError(translateSigninError(error.message)); return; }
       currentUser = data.user;
       hideAuthOverlay();
       await onAuthenticated();
-    } else {
-      $('#authError').textContent = '이메일 확인 링크를 보냈어. 확인 후 로그인해.';
+    } catch (e) {
+      showAuthError('로그인 실패');
+    }
+  }
+
+  async function handleSignup() {
+    const u = $('#authUsername').value.trim();
+    const p = $('#authPassword').value;
+    const uErr = validateUsername(u);
+    if (uErr) { showAuthError(uErr); return; }
+    const pErr = validatePassword(p);
+    if (pErr) { showAuthError(pErr); return; }
+    showAuthError('');
+    const email = usernameToEmail(u);
+    try {
+      const { data, error } = await sb.auth.signUp({ email, password: p });
+      if (error) { showAuthError(translateSignupError(error.message)); return; }
+      if (data.session) {
+        currentUser = data.user;
+        hideAuthOverlay();
+        await onAuthenticated();
+      } else {
+        showAuthError('가입 처리 중 — 다시 로그인 시도');
+      }
+    } catch (e) {
+      showAuthError('가입 실패');
     }
   }
 
   async function handleLogout() {
-    if (!confirm('로그아웃할까? 로컬 데이터는 남아있어.')) return;
-    clearTimeout(pushTimer);
-    await syncPush(true);
-    await sb.auth.signOut();
+    if (!confirm('로그아웃할까?')) return;
+    clearTimeout(pushSharedTimer);
+    clearTimeout(pushProgressTimer);
+    try {
+      await pushShared(true);
+      await pushProgress(true);
+    } catch (e) { /* ignore — local copy still has the data */ }
+    try { await sb.auth.signOut(); } catch (e) { /* ignore */ }
     currentUser = null;
     setSyncStatus('offline');
     showAuthOverlay();
   }
 
+  // ----- One-time migration from old v1-v4 user_data table -----
+  async function migrateFromOldUserData() {
+    if (!currentUser) return;
+    try {
+      // Read the user's old row (may not exist for new accounts — that's fine)
+      const { data: oldRow } = await sb
+        .from('user_data')
+        .select('data')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+      if (!oldRow || !oldRow.data) return;
+      const old = oldRow.data;
+      if (!Array.isArray(old.words) || old.words.length === 0) return;
+
+      // Only migrate shared content if shared_data is empty
+      const { data: sharedRow } = await sb
+        .from('shared_data')
+        .select('data')
+        .eq('id', 1)
+        .maybeSingle();
+      const sharedEmpty = !sharedRow || !sharedRow.data ||
+        !Array.isArray(sharedRow.data.words) || sharedRow.data.words.length === 0;
+
+      if (sharedEmpty) {
+        // Build shared content (strip per-user fields)
+        const sharedNew = {
+          version: 5,
+          decks: old.decks || [],
+          words: (old.words || []).map(w => {
+            const cleaned = Object.assign({}, w);
+            delete cleaned.srs; delete cleaned.srsBlank;
+            delete cleaned.correct; delete cleaned.wrong;
+            return cleaned;
+          })
+        };
+        ensureChapters({ decks: sharedNew.decks, words: sharedNew.words });
+        await sb.from('shared_data').upsert({ id: 1, data: sharedNew }, { onConflict: 'id' });
+      }
+
+      // Always migrate my progress if I don't have one yet
+      const { data: progRow } = await sb
+        .from('user_progress')
+        .select('data')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+      const progEmpty = !progRow || !progRow.data || !progRow.data.progress;
+
+      if (progEmpty) {
+        const progressNew = {};
+        (old.words || []).forEach(w => {
+          if (w.srs || (w.correct && w.correct > 0) || (w.wrong && w.wrong > 0)) {
+            progressNew[w.id] = {
+              srs: w.srs || defaultSrs(),
+              correct: w.correct || 0,
+              wrong: w.wrong || 0
+            };
+          }
+        });
+        await sb.from('user_progress').upsert({
+          user_id: currentUser.id,
+          data: {
+            version: 5,
+            progress: progressNew,
+            currentDeckId: old.currentDeckId,
+            currentChapterId: old.currentChapterId
+          }
+        }, { onConflict: 'user_id' });
+      }
+      toast('기존 데이터 마이그레이션 완료');
+    } catch (e) {
+      console.error('Migration failed (continuing without it)');
+    }
+  }
+
   async function onAuthenticated() {
+    // One-time migration (idempotent)
+    await migrateFromOldUserData();
+    // Pull both tables
     await syncPull();
-    rerenderAfterSync();
+  }
+
+  // ===== Settings (account) =====
+  function showSettings() {
+    if (!currentUser) return;
+    const username = emailToUsername(currentUser.email || '');
+    $('#settingsUsername').textContent = username || '—';
+    $('#newUsername').value = '';
+    $('#newPassword').value = '';
+    $('#settingsOverlay').style.display = 'flex';
+  }
+  function hideSettings() {
+    $('#settingsOverlay').style.display = 'none';
+  }
+
+  async function changeUsername() {
+    const newU = $('#newUsername').value.trim();
+    const err = validateUsername(newU);
+    if (err) { toast(err); return; }
+    const cur = emailToUsername(currentUser.email || '');
+    if (newU.toLowerCase() === cur.toLowerCase()) { toast('지금 아이디와 같아'); return; }
+    if (!confirm(`아이디를 "${newU}"로 변경할까?`)) return;
+    try {
+      const { data, error } = await sb.auth.updateUser({ email: usernameToEmail(newU) });
+      if (error) { toast(translateUpdateError(error.message)); return; }
+      currentUser = data.user;
+      $('#settingsUsername').textContent = emailToUsername(currentUser.email);
+      $('#newUsername').value = '';
+      toast('아이디 변경됨');
+    } catch (e) {
+      toast('변경 실패');
+    }
+  }
+
+  async function changePassword() {
+    const newP = $('#newPassword').value;
+    const err = validatePassword(newP);
+    if (err) { toast(err); return; }
+    if (!confirm('비밀번호를 변경할까?')) return;
+    try {
+      const { error } = await sb.auth.updateUser({ password: newP });
+      if (error) { toast(translateUpdateError(error.message)); return; }
+      $('#newPassword').value = '';
+      toast('비밀번호 변경됨');
+    } catch (e) {
+      toast('변경 실패');
+    }
   }
 
   // ===== Tabs =====
@@ -1630,14 +2030,14 @@
   function goToChapterList(deckId) {
     manageView = { level: 'chapters', deckId, chapterId: null };
     state.currentDeckId = deckId;
-    save();
+    saveProgress();
     renderManage();
   }
   function goToWordList(deckId, chapterId) {
     manageView = { level: 'words', deckId, chapterId };
     state.currentDeckId = deckId;
     state.currentChapterId = chapterId;
-    save();
+    saveProgress();
     renderManage();
   }
 
@@ -1769,7 +2169,7 @@
             <div class="word-meaning">${escapeHtml(w.meaning)}</div>
           </div>
           <div class="word-actions">
-            <span class="stats">${w.correct || 0} · ${w.wrong || 0}</span>
+            <span class="stats">${getProgress(w.id).correct || 0} · ${getProgress(w.id).wrong || 0}</span>
             <button data-edit="${w.id}" title="편집">✎</button>
             <button data-move="${w.id}" title="이동">⇄</button>
             <button class="danger" data-del="${w.id}" title="삭제">×</button>
@@ -1785,7 +2185,9 @@
         const id = b.dataset.del;
         if (confirm('삭제할까?')) {
           state.words = state.words.filter(w => w.id !== id);
-          save();
+          delete state.progress[id];
+          saveShared();
+          saveProgress();
           renderManage();
           updateMeta();
         }
@@ -1852,14 +2254,23 @@
       ? `"${deck.name}" 단어장과 그 안의 ${chN}개 챕터, ${n}개 단어를 모두 삭제할까? (되돌릴 수 없음)`
       : `"${deck.name}" 단어장을 삭제할까?`;
     if (!confirm(msg)) return;
+    // Collect word ids that will be removed, to clean orphan progress
+    const removedWordIds = state.words.filter(w => w.deckId === deckId).map(w => w.id);
     state.decks = state.decks.filter(d => d.id !== deckId);
     state.words = state.words.filter(w => w.deckId !== deckId);
     studySelectedDecks.delete(deckId);
+    removedWordIds.forEach(id => delete state.progress[id]);
     if (state.currentDeckId === deckId) {
-      state.currentDeckId = state.decks[0].id;
-      state.currentChapterId = state.decks[0].chapters[0].id;
+      if (state.decks.length > 0) {
+        state.currentDeckId = state.decks[0].id;
+        state.currentChapterId = state.decks[0].chapters[0].id;
+      } else {
+        state.currentDeckId = null;
+        state.currentChapterId = null;
+      }
     }
-    save();
+    saveShared();
+    saveProgress();
     refreshAddLocation();
     goToDeckList();
     updateMeta();
@@ -1930,12 +2341,15 @@
       ? `"${chapter.name}" 챕터와 그 안의 ${n}개 단어를 삭제할까? (되돌릴 수 없음)`
       : `"${chapter.name}" 챕터를 삭제할까?`;
     if (!confirm(msg)) return;
+    const removedWordIds = state.words.filter(w => w.chapterId === chapterId).map(w => w.id);
     deck.chapters = deck.chapters.filter(c => c.id !== chapterId);
     state.words = state.words.filter(w => w.chapterId !== chapterId);
+    removedWordIds.forEach(id => delete state.progress[id]);
     if (state.currentChapterId === chapterId) {
       state.currentChapterId = deck.chapters[0].id;
     }
-    save();
+    saveShared();
+    saveProgress();
     refreshAddLocation();
     goToChapterList(deckId);
     updateMeta();
@@ -2183,11 +2597,11 @@
     const deck = state.decks.find(d => d.id === state.currentDeckId);
     state.currentChapterId = (deck && deck.chapters && deck.chapters[0]) ? deck.chapters[0].id : null;
     refreshAddChapterOptions();
-    save();
+    saveProgress();
   });
   $('#addChapterSelect').addEventListener('change', () => {
     state.currentChapterId = $('#addChapterSelect').value;
-    save();
+    saveProgress();
   });
 
   // ===== Meta =====
@@ -2329,7 +2743,7 @@
     const now = Date.now();
     const sorted = pool.slice();
     sorted.forEach(w => {
-      const srs = w.srs || defaultSrs();
+      const srs = getProgress(w.id).srs;
       w._priority = (now - srs.due) / DAY_MS + Math.random() * 0.3;
     });
     sorted.sort((a, b) => b._priority - a._priority);
@@ -2433,7 +2847,7 @@
   function renderStudyGrades() {
     if (!studyState) return;
     const card = studyState.cards[studyState.idx];
-    const srs = card.word.srs || defaultSrs();
+    const srs = getProgress(card.word.id).srs;
     const wrap = $('#studyGrades');
     wrap.innerHTML = `
       <button class="btn-grade btn-again" data-rating="again" type="button">모름<span class="interval">${previewInterval(srs, 'again')}</span></button>
@@ -2494,17 +2908,18 @@
     const card = studyState.cards[studyState.idx];
     const w = state.words.find(x => x.id === card.word.id);
     if (w) {
-      w.srs = updateSrs(w.srs || defaultSrs(), rating);
+      const p = ensureProgress(w.id);
+      p.srs = updateSrs(p.srs, rating);
       if (rating === 'again') {
-        w.wrong = (w.wrong || 0) + 1;
+        p.wrong = (p.wrong || 0) + 1;
         studyState.counts.again++;
       } else {
-        w.correct = (w.correct || 0) + 1;
+        p.correct = (p.correct || 0) + 1;
         if (rating === 'good') studyState.counts.good++;
         else if (rating === 'hard') studyState.counts.hard++;
       }
     }
-    save();
+    saveProgress();
 
     studyState.idx++;
     if (studyState.idx >= studyState.cards.length) {
@@ -2638,6 +3053,7 @@
         });
         const existingKeys = new Set(state.words.map(w => `${w.deckId}::${w.term.toLowerCase()}`));
         let added = 0;
+        let progressImported = 0;
         for (const w of (migrated.words || [])) {
           const newDeckId = deckIdMap[w.deckId] || state.currentDeckId;
           const targetDeck = state.decks.find(d => d.id === newDeckId);
@@ -2655,22 +3071,29 @@
             examples: Array.isArray(w.examples) ? w.examples.map(e => ({
               id: uid(), text: e.text, meaning: e.meaning || ''
             })) : [],
-            created: w.created || Date.now(),
-            correct: w.correct || 0, wrong: w.wrong || 0
+            created: w.created || Date.now()
           };
-          if (w.srs) nw.srs = w.srs;
-          if (w.srsBlank) nw.srsBlank = w.srsBlank;
           ensureWord(nw);
           state.words.unshift(nw);
           added++;
+          // Per-user fields from the imported file go into MY progress (current logged-in user)
+          if (w.srs || (w.correct && w.correct > 0) || (w.wrong && w.wrong > 0)) {
+            state.progress[nw.id] = {
+              srs: w.srs || defaultSrs(),
+              correct: w.correct || 0,
+              wrong: w.wrong || 0
+            };
+            progressImported++;
+          }
         }
-        save();
+        saveShared();
+        if (progressImported > 0) saveProgress();
         refreshAddLocation();
         renderManage();
         updateMeta();
-        toast(`${added}개 추가됨`);
+        toast(progressImported > 0 ? `${added}개 추가됨 (내 진도 ${progressImported}개 포함)` : `${added}개 추가됨`);
       } catch (err) {
-        console.error(err);
+        console.error('Import failed');
         toast('파일을 읽을 수 없어');
       }
     };
@@ -2679,20 +3102,29 @@
   });
 
   $('#btnReset').addEventListener('click', () => {
-    if (state.words.length === 0 && state.decks.length <= 1) { toast('이미 비어있어'); return; }
-    if (confirm(`전체 단어장(${state.decks.length}개)과 단어(${state.words.length}개)를 모두 삭제할까? (되돌릴 수 없음)`)) {
-      state.decks = [];
-      state.words = [];
-      state.currentDeckId = null;
-      state.currentChapterId = null;
-      studySelectedDecks = new Set();
-      ensureValidDeckState();
-      save();
-      refreshAddLocation();
-      goToDeckList();
+    if (Object.keys(state.progress).length === 0) { toast('초기화할 공부 기록이 없어'); return; }
+    if (confirm('내 공부 기록 (SRS · 정답/오답 카운트)을 모두 초기화할까? 공유 단어장 콘텐츠는 그대로 유지돼.')) {
+      state.progress = {};
+      saveProgress();
+      renderManage();
       updateMeta();
-      toast('전체 삭제됨');
+      toast('내 공부 기록 초기화됨');
     }
+  });
+
+  // ===== Settings (account) modal wiring =====
+  $('#btnSettings').addEventListener('click', showSettings);
+  $('#btnSettingsClose').addEventListener('click', hideSettings);
+  $('#btnSaveUsername').addEventListener('click', changeUsername);
+  $('#btnSavePassword').addEventListener('click', changePassword);
+  $('#settingsOverlay').addEventListener('click', e => {
+    if (e.target === $('#settingsOverlay')) hideSettings();
+  });
+  $('#newUsername').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); changeUsername(); }
+  });
+  $('#newPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); changePassword(); }
   });
 
   // ===== Init =====
@@ -2707,7 +3139,7 @@
   $('#authPassword').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); handleSignin(); }
   });
-  $('#authEmail').addEventListener('keydown', e => {
+  $('#authUsername').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); $('#authPassword').focus(); }
   });
 
@@ -2718,7 +3150,9 @@
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && currentUser) syncPull();
   });
-  window.addEventListener('online', () => { if (currentUser) syncPush(); });
+  window.addEventListener('online', () => {
+    if (currentUser) { pushShared(); pushProgress(); }
+  });
   window.addEventListener('offline', () => setSyncStatus('offline'));
 
   (async () => {
@@ -2730,7 +3164,7 @@
     } else {
       setSyncStatus('offline');
       showAuthOverlay();
-      $('#authEmail').focus();
+      $('#authUsername').focus();
     }
   })();
 
