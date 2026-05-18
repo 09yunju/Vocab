@@ -82,66 +82,80 @@
     color: var(--ink-faint);
   }
 
-  /* ===== Deck pills ===== */
-  .deck-bar {
+  /* ===== Manage browser (decks/chapters/words hierarchy) ===== */
+  .manage-breadcrumb {
     display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding: 6px 0 16px;
-    margin-bottom: 16px;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 6px;
     border-bottom: 1px dashed var(--rule);
-    -webkit-overflow-scrolling: touch;
+    flex-wrap: wrap;
   }
-  .deck-bar::-webkit-scrollbar { height: 4px; }
-  .deck-bar::-webkit-scrollbar-track { background: transparent; }
-  .deck-bar::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
-
-  .deck-pill {
-    background: transparent;
-    border: 1px solid var(--rule);
+  .manage-back {
+    background: none;
+    border: none;
     color: var(--ink-soft);
-    padding: 6px 14px;
-    border-radius: 999px;
     cursor: pointer;
-    font-family: 'Noto Sans KR', system-ui, sans-serif;
+    font-family: 'IBM Plex Sans KR', 'Noto Sans KR', sans-serif;
     font-size: 13px;
+    padding: 4px 0;
+    transition: color 0.15s;
+  }
+  .manage-back:hover { color: var(--accent); }
+  .manage-current {
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-size: 18px;
     font-weight: 500;
-    white-space: nowrap;
-    display: inline-flex;
+    color: var(--ink);
+  }
+
+  .manage-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px;
+  }
+  .manage-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
+    gap: 12px;
+    padding: 16px 4px;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .manage-row:hover { background: var(--paper-2); }
+  .manage-name {
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .manage-meta {
+    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-top: 2px;
+  }
+  .manage-action {
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 6px 10px;
+    border-radius: 2px;
     transition: all 0.15s;
   }
-  .deck-pill:hover { color: var(--ink); border-color: var(--ink-soft); }
-  .deck-pill.active {
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
-  }
-  .deck-pill.add {
-    color: var(--ink-faint);
-    border-style: dashed;
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-style: italic;
-  }
-  .deck-pill .deck-count {
-    font-family: 'Fraunces', 'Noto Sans KR', sans-serif;
-    font-style: italic;
-    font-size: 11px;
-    opacity: 0.7;
-  }
-  .deck-pill.active .deck-count { color: var(--paper); opacity: 0.7; }
-  .deck-pill .deck-more {
-    margin-left: 4px;
-    padding-left: 8px;
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 14px;
-    letter-spacing: 1px;
-    line-height: 1;
-    opacity: 0.8;
+  .manage-action:hover {
+    color: var(--ink);
+    background: var(--paper-soft);
   }
 
+  /* Deck/chapter context menu (reused popup) */
   .deck-menu {
     position: fixed;
     background: var(--paper);
@@ -173,6 +187,42 @@
   }
   .deck-menu button:hover { background: var(--paper-2); color: var(--ink); }
   .deck-menu button.danger:hover { color: var(--bad); }
+
+  /* Add-form location selector */
+  .add-location { margin-bottom: 22px; }
+  .location-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .location-row select {
+    flex: 1;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 10px 12px;
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--ink-faint) 50%), linear-gradient(135deg, var(--ink-faint) 50%, transparent 50%);
+    background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%;
+    background-size: 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 28px;
+  }
+  .location-row select:focus {
+    outline: none;
+    border-color: var(--ink-soft);
+    background-color: var(--paper-soft);
+  }
+  .location-sep {
+    color: var(--ink-faint);
+    font-size: 16px;
+    user-select: none;
+  }
 
   /* ===== Tabs ===== */
   nav.tabs {
@@ -952,17 +1002,22 @@
     <div class="meta" id="meta">시작해보자</div>
   </header>
 
-  <div class="deck-bar" id="deckBar"></div>
-
   <nav class="tabs">
     <button class="tab active" data-tab="add">추가</button>
-    <button class="tab" data-tab="list">목록 <span class="count" id="countList">0</span></button>
+    <button class="tab" data-tab="decks">단어장 <span class="count" id="countList">0</span></button>
     <button class="tab" data-tab="study">공부</button>
   </nav>
 
   <!-- ADD -->
   <section class="panel active" id="panel-add">
-    <div class="add-context" id="addContext"></div>
+    <div class="field add-location">
+      <label>저장 위치</label>
+      <div class="location-row">
+        <select id="addDeckSelect"></select>
+        <span class="location-sep">›</span>
+        <select id="addChapterSelect"></select>
+      </div>
+    </div>
 
     <div class="field">
       <label>단어 / Palabra</label>
@@ -987,12 +1042,9 @@
     </div>
   </section>
 
-  <!-- LIST -->
-  <section class="panel" id="panel-list">
-    <div class="toolbar">
-      <input type="text" id="search" placeholder="검색..." autocomplete="off">
-    </div>
-    <ul class="word-list" id="wordList"></ul>
+  <!-- DECKS / CHAPTERS / WORDS (hierarchical browser) -->
+  <section class="panel" id="panel-decks">
+    <div id="manageContent"></div>
   </section>
 
   <!-- STUDY (flashcards) -->
@@ -1096,6 +1148,7 @@
   let state = {
     decks: [],
     currentDeckId: null,
+    currentChapterId: null,
     words: [],
     lastSyncedAt: 0
   };
@@ -1208,9 +1261,10 @@
 
   function saveLocal() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      version: 3,
+      version: 4,
       decks: state.decks,
       currentDeckId: state.currentDeckId,
+      currentChapterId: state.currentChapterId,
       words: state.words,
       lastSyncedAt: state.lastSyncedAt || 0
     }));
@@ -1241,14 +1295,14 @@
       return { decks: [def], currentDeckId: def.id, words, lastSyncedAt: 0 };
     }
 
-    // Detect format. v3 (current) has version=3 OR words have 'examples' but no 'expressions'.
+    // Detect format. v3+ has 'examples' field on words (no 'expressions').
     // v2 has words with 'expressions' nested.
     const sample = (raw.words || [])[0];
-    const isV3 = raw.version === 3 || (sample && Array.isArray(sample.examples) && !('expressions' in sample));
-    if (isV3) {
-      // Just ensure SRS etc
+    const isV3Plus = raw.version === 3 || raw.version === 4 || (sample && Array.isArray(sample.examples) && !('expressions' in sample));
+    if (isV3Plus) {
+      // Just ensure SRS etc, then ensure chapters
       (raw.words || []).forEach(ensureWord);
-      return raw;
+      return ensureChapters(raw);
     }
 
     // v2 → v3: flatten expressions into separate top-level words
@@ -1287,13 +1341,44 @@
         newWords.push(ew);
       }
     }
-    return {
-      version: 3,
+    const migrated = {
+      version: 4,
       decks: raw.decks || [],
       currentDeckId: raw.currentDeckId,
+      currentChapterId: raw.currentChapterId,
       words: newWords,
       lastSyncedAt: raw.lastSyncedAt || 0
     };
+    return ensureChapters(migrated);
+  }
+
+  // Deterministic default chapter id per deck, so independent migrations on PC/iPhone
+  // produce identical chapter ids and don't conflict on sync.
+  function defaultChapterIdFor(deckId) {
+    return 'c_default_' + deckId;
+  }
+
+  // Ensure every deck has at least one chapter, and every word has a valid chapterId.
+  // Idempotent — safe to run repeatedly.
+  function ensureChapters(data) {
+    if (!data) return data;
+    (data.decks || []).forEach(d => {
+      if (!Array.isArray(d.chapters) || d.chapters.length === 0) {
+        d.chapters = [{
+          id: defaultChapterIdFor(d.id),
+          name: '기본',
+          created: d.created || Date.now()
+        }];
+      }
+    });
+    (data.words || []).forEach(w => {
+      const d = (data.decks || []).find(x => x.id === w.deckId);
+      if (!d) return;
+      if (!w.chapterId || !d.chapters.find(c => c.id === w.chapterId)) {
+        w.chapterId = d.chapters[0].id;
+      }
+    });
+    return data;
   }
 
   function load() {
@@ -1302,7 +1387,7 @@
       if (v2raw) {
         const data = migrateData(JSON.parse(v2raw));
         if (data) applyData(data);
-        if (data && data.version !== 3) saveLocal(); // persist migration
+        if (data && data.version !== 4) saveLocal(); // persist migration
         ensureValidDeckState();
         return;
       }
@@ -1326,6 +1411,7 @@
   function applyData(data) {
     state.decks = Array.isArray(data.decks) ? data.decks : [];
     state.currentDeckId = data.currentDeckId;
+    state.currentChapterId = data.currentChapterId;
     state.words = Array.isArray(data.words) ? data.words : [];
     state.lastSyncedAt = data.lastSyncedAt || 0;
     state.words.forEach(ensureWord);
@@ -1334,12 +1420,34 @@
   function ensureValidDeckState() {
     if (!state.decks || state.decks.length === 0) {
       const def = { id: 'd_' + uid(), name: '기본', created: Date.now() };
+      def.chapters = [{ id: defaultChapterIdFor(def.id), name: '기본', created: Date.now() }];
       state.decks = [def];
       state.currentDeckId = def.id;
+      state.currentChapterId = def.chapters[0].id;
     }
+    // Ensure every deck has chapters (idempotent safety)
+    state.decks.forEach(d => {
+      if (!Array.isArray(d.chapters) || d.chapters.length === 0) {
+        d.chapters = [{ id: defaultChapterIdFor(d.id), name: '기본', created: d.created || Date.now() }];
+      }
+    });
+    // Validate currentDeckId
     if (!state.currentDeckId || !state.decks.find(d => d.id === state.currentDeckId)) {
       state.currentDeckId = state.decks[0].id;
     }
+    // Validate currentChapterId against current deck
+    const cd = state.decks.find(d => d.id === state.currentDeckId);
+    if (cd && (!state.currentChapterId || !cd.chapters.find(c => c.id === state.currentChapterId))) {
+      state.currentChapterId = cd.chapters[0].id;
+    }
+    // Validate all word chapterIds
+    state.words.forEach(w => {
+      const d = state.decks.find(x => x.id === w.deckId);
+      if (!d) return;
+      if (!w.chapterId || !d.chapters.find(c => c.id === w.chapterId)) {
+        w.chapterId = d.chapters[0].id;
+      }
+    });
   }
 
   // ===== Cloud sync =====
@@ -1409,9 +1517,10 @@
         .upsert({
           user_id: currentUser.id,
           data: {
-            version: 3,
+            version: 4,
             decks: state.decks,
             currentDeckId: state.currentDeckId,
+            currentChapterId: state.currentChapterId,
             words: state.words
           }
         }, { onConflict: 'user_id' })
@@ -1434,9 +1543,9 @@
   }
 
   function rerenderAfterSync() {
-    renderDeckBar();
+    refreshAddLocation();
     updateMeta();
-    if ($('#panel-list').classList.contains('active')) renderList();
+    if ($('#panel-decks').classList.contains('active')) renderManage();
     if ($('#panel-study').classList.contains('active')) resetStudyView();
   }
 
@@ -1497,53 +1606,224 @@
   function switchTab(name) {
     $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
     $$('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
-    if (name === 'list') renderList();
+    if (name === 'decks') renderManage();
     if (name === 'study') resetStudyView();
   }
   $$('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
 
-  // ===== Decks =====
-  function renderDeckBar() {
-    const bar = $('#deckBar');
-    const pills = state.decks.map(d => {
-      const isActive = d.id === state.currentDeckId;
-      const n = wordsInDeck(d.id).length;
-      return `<button class="deck-pill ${isActive ? 'active' : ''}" data-deck="${d.id}">
-        <span>${escapeHtml(d.name)}</span>
-        <span class="deck-count">${n}</span>
-        ${isActive ? '<span class="deck-more" aria-hidden="true">⋯</span>' : ''}
-      </button>`;
-    }).join('');
-    bar.innerHTML = pills + `<button class="deck-pill add" id="btnNewDeck">+ 새 단어장</button>`;
-    bar.querySelectorAll('[data-deck]').forEach(b => {
-      b.addEventListener('click', () => {
-        const id = b.dataset.deck;
-        if (id === state.currentDeckId) openDeckMenu(id, b);
-        else switchDeck(id);
-      });
-    });
-    $('#btnNewDeck').addEventListener('click', createDeck);
+  // ===== Manage browser (decks → chapters → words) =====
+  let manageView = { level: 'decks', deckId: null, chapterId: null };
+  let openMenu = null;
+
+  function renderManage() {
+    const root = $('#manageContent');
+    if (!root) return;
+    if (manageView.level === 'decks') renderDeckListView(root);
+    else if (manageView.level === 'chapters') renderChapterListView(root);
+    else if (manageView.level === 'words') renderWordListView(root);
   }
 
-  function switchDeck(deckId) {
+  function goToDeckList() {
+    manageView = { level: 'decks', deckId: null, chapterId: null };
+    renderManage();
+  }
+  function goToChapterList(deckId) {
+    manageView = { level: 'chapters', deckId, chapterId: null };
     state.currentDeckId = deckId;
     save();
-    renderDeckBar();
-    renderList();
-    updateMeta();
+    renderManage();
   }
+  function goToWordList(deckId, chapterId) {
+    manageView = { level: 'words', deckId, chapterId };
+    state.currentDeckId = deckId;
+    state.currentChapterId = chapterId;
+    save();
+    renderManage();
+  }
+
+  function renderDeckListView(root) {
+    const rows = state.decks.map(d => {
+      const chCount = (d.chapters || []).length;
+      const wCount = wordsInDeck(d.id).length;
+      return `<li class="manage-row" data-deck="${d.id}">
+        <div>
+          <div class="manage-name">${escapeHtml(d.name)}</div>
+          <div class="manage-meta">${chCount}장 · ${wCount}단어</div>
+        </div>
+        <button class="manage-action" data-deck-menu="${d.id}" type="button" aria-label="옵션">⋯</button>
+      </li>`;
+    }).join('');
+    root.innerHTML = `
+      <ul class="manage-list">${rows}</ul>
+      <button class="add-row-btn" id="btnNewDeck" type="button">+ 새 단어장</button>
+    `;
+    root.querySelectorAll('[data-deck]').forEach(el => {
+      el.addEventListener('click', e => {
+        if (e.target.closest('[data-deck-menu]')) return;
+        goToChapterList(el.dataset.deck);
+      });
+    });
+    root.querySelectorAll('[data-deck-menu]').forEach(b => {
+      b.addEventListener('click', e => {
+        e.stopPropagation();
+        openDeckMenu(b.dataset.deckMenu, b);
+      });
+    });
+    root.querySelector('#btnNewDeck').addEventListener('click', createDeck);
+  }
+
+  function renderChapterListView(root) {
+    const deck = state.decks.find(d => d.id === manageView.deckId);
+    if (!deck) { goToDeckList(); return; }
+    const rows = (deck.chapters || []).map(c => {
+      const wCount = state.words.filter(w => w.chapterId === c.id).length;
+      return `<li class="manage-row" data-chapter="${c.id}">
+        <div>
+          <div class="manage-name">${escapeHtml(c.name)}</div>
+          <div class="manage-meta">${wCount}단어</div>
+        </div>
+        <button class="manage-action" data-chapter-menu="${c.id}" type="button" aria-label="옵션">⋯</button>
+      </li>`;
+    }).join('');
+    root.innerHTML = `
+      <nav class="manage-breadcrumb">
+        <button class="manage-back" id="btnBackToDecks" type="button">← 단어장</button>
+        <span class="manage-current">${escapeHtml(deck.name)}</span>
+      </nav>
+      <ul class="manage-list">${rows}</ul>
+      <button class="add-row-btn" id="btnNewChapter" type="button">+ 새 챕터</button>
+    `;
+    root.querySelector('#btnBackToDecks').addEventListener('click', goToDeckList);
+    root.querySelectorAll('[data-chapter]').forEach(el => {
+      el.addEventListener('click', e => {
+        if (e.target.closest('[data-chapter-menu]')) return;
+        goToWordList(deck.id, el.dataset.chapter);
+      });
+    });
+    root.querySelectorAll('[data-chapter-menu]').forEach(b => {
+      b.addEventListener('click', e => {
+        e.stopPropagation();
+        openChapterMenu(deck.id, b.dataset.chapterMenu, b);
+      });
+    });
+    root.querySelector('#btnNewChapter').addEventListener('click', () => createChapter(deck.id));
+  }
+
+  function renderWordListView(root) {
+    const deck = state.decks.find(d => d.id === manageView.deckId);
+    if (!deck) { goToDeckList(); return; }
+    const chapter = (deck.chapters || []).find(c => c.id === manageView.chapterId);
+    if (!chapter) { goToChapterList(deck.id); return; }
+
+    const allWords = state.words.filter(w => w.chapterId === chapter.id);
+    const q = (root.querySelector('#wordSearch')?.value || '').trim().toLowerCase();
+    const filtered = q ? allWords.filter(w => {
+      if (w.term.toLowerCase().includes(q)) return true;
+      if (w.meaning.toLowerCase().includes(q)) return true;
+      return (w.examples || []).some(e =>
+        e.text.toLowerCase().includes(q) || (e.meaning && e.meaning.toLowerCase().includes(q))
+      );
+    }) : allWords;
+
+    let listHtml;
+    if (filtered.length === 0) {
+      const msg = allWords.length === 0 ? '아직 단어가 없어' : '검색 결과 없음';
+      listHtml = `<div class="empty"><span class="ornament">· · ·</span>${escapeHtml(msg)}</div>`;
+    } else {
+      listHtml = `<ul class="word-list">${filtered.map(renderWordItem).join('')}</ul>`;
+    }
+
+    root.innerHTML = `
+      <nav class="manage-breadcrumb">
+        <button class="manage-back" id="btnBackToChapters" type="button">← ${escapeHtml(deck.name)}</button>
+        <span class="manage-current">${escapeHtml(chapter.name)}</span>
+      </nav>
+      <div class="toolbar">
+        <input type="text" id="wordSearch" placeholder="검색..." autocomplete="off" value="${escapeAttr(q)}">
+      </div>
+      ${listHtml}
+    `;
+
+    root.querySelector('#btnBackToChapters').addEventListener('click', () => goToChapterList(deck.id));
+    root.querySelector('#wordSearch').addEventListener('input', () => renderWordListView(root));
+    wireUpWordActions(root);
+  }
+
+  function renderWordItem(w) {
+    const deckLang = getDeckLang(w.deckId);
+    const exs = w.examples || [];
+    const exsHtml = exs.length > 0 ? `
+      <div class="word-examples">
+        ${exs.map(e => `
+          <div class="word-example">
+            <div class="word-example-text">${escapeHtml(e.text)}<button class="speak-btn-tiny" data-speak="${escapeAttr(e.text)}" data-lang="${escapeAttr(deckLang)}" title="발음">♪</button></div>
+            ${e.meaning ? `<div class="word-example-meaning">${escapeHtml(e.meaning)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>` : '';
+    return `
+      <li class="word-item" data-id="${w.id}">
+        <div class="word-head">
+          <div>
+            <div class="word-term">${escapeHtml(w.term)}<button class="speak-btn" data-speak="${escapeAttr(w.term)}" data-lang="${escapeAttr(deckLang)}" title="발음">♪</button></div>
+            <div class="word-meaning">${escapeHtml(w.meaning)}</div>
+          </div>
+          <div class="word-actions">
+            <span class="stats">${w.correct || 0} · ${w.wrong || 0}</span>
+            <button data-edit="${w.id}" title="편집">✎</button>
+            <button data-move="${w.id}" title="이동">⇄</button>
+            <button class="danger" data-del="${w.id}" title="삭제">×</button>
+          </div>
+        </div>
+        ${exsHtml}
+      </li>`;
+  }
+
+  function wireUpWordActions(root) {
+    root.querySelectorAll('[data-del]').forEach(b => {
+      b.addEventListener('click', () => {
+        const id = b.dataset.del;
+        if (confirm('삭제할까?')) {
+          state.words = state.words.filter(w => w.id !== id);
+          save();
+          renderManage();
+          updateMeta();
+        }
+      });
+    });
+    root.querySelectorAll('[data-edit]').forEach(b => {
+      b.addEventListener('click', () => openEditModal(b.dataset.edit));
+    });
+    root.querySelectorAll('[data-move]').forEach(b => {
+      b.addEventListener('click', () => openMoveDialog(b.dataset.move));
+    });
+    root.querySelectorAll('[data-speak]').forEach(b => {
+      b.addEventListener('click', () => speak(b.dataset.speak, b.dataset.lang));
+    });
+  }
+
+  // ===== Deck CRUD =====
   function createDeck() {
     const name = prompt('새 단어장 이름');
     if (name === null) return;
     const t = name.trim();
     if (!t) { toast('이름을 입력해줘'); return; }
     if (state.decks.some(d => d.name === t)) { toast('같은 이름의 단어장이 있어'); return; }
-    const deck = { id: 'd_' + uid(), name: t, created: Date.now() };
+    const deck = {
+      id: 'd_' + uid(),
+      name: t,
+      created: Date.now(),
+      chapters: []
+    };
+    deck.chapters.push({
+      id: defaultChapterIdFor(deck.id),
+      name: '기본',
+      created: Date.now()
+    });
     state.decks.push(deck);
-    state.currentDeckId = deck.id;
     save();
-    renderDeckBar();
-    renderList();
+    refreshAddLocation();
+    renderManage();
     updateMeta();
     toast('단어장 생성됨');
   }
@@ -1557,7 +1837,8 @@
     if (state.decks.some(d => d.id !== deckId && d.name === t)) { toast('같은 이름의 단어장이 있어'); return; }
     deck.name = t;
     save();
-    renderDeckBar();
+    refreshAddLocation();
+    renderManage();
     updateMeta();
     toast('이름 변경됨');
   }
@@ -1566,22 +1847,112 @@
     const deck = state.decks.find(d => d.id === deckId);
     if (!deck) return;
     const n = wordsInDeck(deckId).length;
+    const chN = (deck.chapters || []).length;
     const msg = n > 0
-      ? `"${deck.name}" 단어장과 그 안의 ${n}개 단어를 삭제할까? (되돌릴 수 없음)`
+      ? `"${deck.name}" 단어장과 그 안의 ${chN}개 챕터, ${n}개 단어를 모두 삭제할까? (되돌릴 수 없음)`
       : `"${deck.name}" 단어장을 삭제할까?`;
     if (!confirm(msg)) return;
     state.decks = state.decks.filter(d => d.id !== deckId);
     state.words = state.words.filter(w => w.deckId !== deckId);
     studySelectedDecks.delete(deckId);
-    if (state.currentDeckId === deckId) state.currentDeckId = state.decks[0].id;
+    if (state.currentDeckId === deckId) {
+      state.currentDeckId = state.decks[0].id;
+      state.currentChapterId = state.decks[0].chapters[0].id;
+    }
     save();
-    renderDeckBar();
-    renderList();
+    refreshAddLocation();
+    goToDeckList();
+    updateMeta();
+    toast('삭제됨');
+  }
+  function setDeckLang(deckId) {
+    const deck = state.decks.find(d => d.id === deckId);
+    if (!deck) return;
+    const current = deck.lang || 'es-ES';
+    const lang = prompt(
+      '발음 언어 코드 (예: es-ES 스페인어, en-US 영어, ja-JP 일본어, fr-FR, de-DE, zh-CN, ko-KR)',
+      current
+    );
+    if (lang === null) return;
+    const t = lang.trim();
+    if (!t) { toast('언어 코드를 입력해줘'); return; }
+    deck.lang = t;
+    save();
+    renderManage();
+    toast('언어 설정됨: ' + t);
+  }
+  function getDeckLang(deckId) {
+    const d = state.decks.find(x => x.id === deckId);
+    return (d && d.lang) || 'es-ES';
+  }
+
+  // ===== Chapter CRUD =====
+  function createChapter(deckId) {
+    const deck = state.decks.find(d => d.id === deckId);
+    if (!deck) return;
+    const name = prompt('새 챕터 이름');
+    if (name === null) return;
+    const t = name.trim();
+    if (!t) { toast('이름을 입력해줘'); return; }
+    if ((deck.chapters || []).some(c => c.name === t)) { toast('같은 이름의 챕터가 있어'); return; }
+    const chapter = { id: 'c_' + uid(), name: t, created: Date.now() };
+    if (!deck.chapters) deck.chapters = [];
+    deck.chapters.push(chapter);
+    save();
+    refreshAddLocation();
+    renderManage();
+    toast('챕터 생성됨');
+  }
+  function renameChapter(deckId, chapterId) {
+    const deck = state.decks.find(d => d.id === deckId);
+    if (!deck) return;
+    const chapter = (deck.chapters || []).find(c => c.id === chapterId);
+    if (!chapter) return;
+    const name = prompt('새 이름', chapter.name);
+    if (name === null) return;
+    const t = name.trim();
+    if (!t) { toast('이름을 입력해줘'); return; }
+    if ((deck.chapters || []).some(c => c.id !== chapterId && c.name === t)) { toast('같은 이름의 챕터가 있어'); return; }
+    chapter.name = t;
+    save();
+    refreshAddLocation();
+    renderManage();
+    toast('이름 변경됨');
+  }
+  function deleteChapter(deckId, chapterId) {
+    const deck = state.decks.find(d => d.id === deckId);
+    if (!deck) return;
+    if ((deck.chapters || []).length <= 1) { toast('마지막 챕터는 삭제할 수 없어'); return; }
+    const chapter = (deck.chapters || []).find(c => c.id === chapterId);
+    if (!chapter) return;
+    const n = state.words.filter(w => w.chapterId === chapterId).length;
+    const msg = n > 0
+      ? `"${chapter.name}" 챕터와 그 안의 ${n}개 단어를 삭제할까? (되돌릴 수 없음)`
+      : `"${chapter.name}" 챕터를 삭제할까?`;
+    if (!confirm(msg)) return;
+    deck.chapters = deck.chapters.filter(c => c.id !== chapterId);
+    state.words = state.words.filter(w => w.chapterId !== chapterId);
+    if (state.currentChapterId === chapterId) {
+      state.currentChapterId = deck.chapters[0].id;
+    }
+    save();
+    refreshAddLocation();
+    goToChapterList(deckId);
     updateMeta();
     toast('삭제됨');
   }
 
-  let openMenu = null;
+  // ===== Context menu (deck or chapter) =====
+  function positionMenu(menu, anchor) {
+    const rect = anchor.getBoundingClientRect();
+    let top = rect.bottom + 4, left = rect.left;
+    const mr = menu.getBoundingClientRect();
+    if (left + mr.width > window.innerWidth - 8) left = window.innerWidth - mr.width - 8;
+    if (top + mr.height > window.innerHeight - 8) top = rect.top - mr.height - 4;
+    menu.style.top = top + 'px';
+    menu.style.left = left + 'px';
+  }
+
   function openDeckMenu(deckId, anchor) {
     closeDeckMenu();
     const deck = state.decks.find(d => d.id === deckId);
@@ -1596,13 +1967,7 @@
     `;
     document.body.appendChild(menu);
     openMenu = menu;
-    const rect = anchor.getBoundingClientRect();
-    let top = rect.bottom + 4, left = rect.left;
-    const mr = menu.getBoundingClientRect();
-    if (left + mr.width > window.innerWidth - 8) left = window.innerWidth - mr.width - 8;
-    if (top + mr.height > window.innerHeight - 8) top = rect.top - mr.height - 4;
-    menu.style.top = top + 'px';
-    menu.style.left = left + 'px';
+    positionMenu(menu, anchor);
     menu.querySelectorAll('button').forEach(b => {
       b.addEventListener('click', e => {
         e.stopPropagation();
@@ -1615,28 +1980,99 @@
     });
     setTimeout(() => document.addEventListener('click', closeDeckMenu, { once: true }), 0);
   }
-  function closeDeckMenu() { if (openMenu) { openMenu.remove(); openMenu = null; } }
 
-  function setDeckLang(deckId) {
+  function openChapterMenu(deckId, chapterId, anchor) {
+    closeDeckMenu();
     const deck = state.decks.find(d => d.id === deckId);
     if (!deck) return;
-    const current = deck.lang || 'es-ES';
-    const lang = prompt(
-      '발음 언어 코드 (예: es-ES 스페인어, en-US 영어, ja-JP 일본어, fr-FR, de-DE, zh-CN, ko-KR)',
-      current
-    );
-    if (lang === null) return;
-    const t = lang.trim();
-    if (!t) { toast('언어 코드를 입력해줘'); return; }
-    deck.lang = t;
-    save();
-    renderDeckBar();
-    toast('언어 설정됨: ' + t);
+    const canDelete = (deck.chapters || []).length > 1;
+    const menu = document.createElement('div');
+    menu.className = 'deck-menu';
+    menu.innerHTML = `
+      <button data-action="rename">✎ 이름 변경</button>
+      ${canDelete ? `<button data-action="delete" class="danger">🗑 삭제</button>` : ''}
+    `;
+    document.body.appendChild(menu);
+    openMenu = menu;
+    positionMenu(menu, anchor);
+    menu.querySelectorAll('button').forEach(b => {
+      b.addEventListener('click', e => {
+        e.stopPropagation();
+        const action = b.dataset.action;
+        closeDeckMenu();
+        if (action === 'rename') renameChapter(deckId, chapterId);
+        else if (action === 'delete') deleteChapter(deckId, chapterId);
+      });
+    });
+    setTimeout(() => document.addEventListener('click', closeDeckMenu, { once: true }), 0);
   }
 
-  function getDeckLang(deckId) {
-    const d = state.decks.find(x => x.id === deckId);
-    return (d && d.lang) || 'es-ES';
+  function closeDeckMenu() { if (openMenu) { openMenu.remove(); openMenu = null; } }
+
+  // ===== Move word dialog =====
+  function openMoveDialog(wordId) {
+    const w = state.words.find(x => x.id === wordId);
+    if (!w) return;
+    let selDeck = w.deckId;
+    let selChapter = w.chapterId;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+
+    function render() {
+      const deck = state.decks.find(d => d.id === selDeck);
+      const chapters = deck ? (deck.chapters || []) : [];
+      overlay.innerHTML = `
+        <div class="modal">
+          <h3>이동할 위치</h3>
+          <div class="field">
+            <label>단어장</label>
+            <div class="location-row">
+              <select id="moveDeck">
+                ${state.decks.map(d => `<option value="${d.id}" ${d.id === selDeck ? 'selected' : ''}>${escapeHtml(d.name)}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>챕터</label>
+            <div class="location-row">
+              <select id="moveChapter">
+                ${chapters.map(c => `<option value="${c.id}" ${c.id === selChapter ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top: 20px;">
+            <button class="btn" id="moveConfirm" type="button">이동</button>
+            <button class="btn btn-ghost" id="moveCancel" type="button">취소</button>
+          </div>
+        </div>`;
+      overlay.querySelector('#moveDeck').addEventListener('change', e => {
+        selDeck = e.target.value;
+        const newDeck = state.decks.find(d => d.id === selDeck);
+        selChapter = newDeck && newDeck.chapters && newDeck.chapters[0] ? newDeck.chapters[0].id : null;
+        render();
+      });
+      overlay.querySelector('#moveChapter').addEventListener('change', e => {
+        selChapter = e.target.value;
+      });
+      overlay.querySelector('#moveConfirm').addEventListener('click', () => {
+        if (!selDeck || !selChapter) { toast('위치를 선택해줘'); return; }
+        const changed = w.deckId !== selDeck || w.chapterId !== selChapter;
+        w.deckId = selDeck;
+        w.chapterId = selChapter;
+        if (changed) save();
+        overlay.remove();
+        renderManage();
+        toast(changed ? '이동됨' : '변경 없음');
+      });
+      overlay.querySelector('#moveCancel').addEventListener('click', () => overlay.remove());
+    }
+
+    document.body.appendChild(overlay);
+    render();
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.remove();
+    });
   }
 
   // ===== Speech =====
@@ -1684,6 +2120,26 @@
   }
 
   // ===== Add =====
+  function refreshAddLocation() {
+    const ds = $('#addDeckSelect');
+    if (!ds) return;
+    ds.innerHTML = state.decks.map(d => `<option value="${d.id}" ${d.id === state.currentDeckId ? 'selected' : ''}>${escapeHtml(d.name)}</option>`).join('');
+    refreshAddChapterOptions();
+  }
+  function refreshAddChapterOptions() {
+    const deckId = $('#addDeckSelect').value;
+    const deck = state.decks.find(d => d.id === deckId);
+    const cs = $('#addChapterSelect');
+    if (!cs) return;
+    if (!deck) { cs.innerHTML = ''; return; }
+    cs.innerHTML = (deck.chapters || []).map(c => `<option value="${c.id}" ${c.id === state.currentChapterId ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('');
+    // Sanity: if no chapter matched, fall back to first
+    if (cs.selectedIndex === -1 && cs.options.length > 0) {
+      cs.selectedIndex = 0;
+      state.currentChapterId = cs.value;
+    }
+  }
+
   function clearAddForm() {
     $('#inputTerm').value = '';
     $('#inputMeaning').value = '';
@@ -1696,10 +2152,13 @@
     const term = $('#inputTerm').value.trim();
     const meaning = $('#inputMeaning').value.trim();
     if (!term || !meaning) { toast('단어와 뜻을 입력해줘'); return; }
+    const deckId = $('#addDeckSelect').value;
+    const chapterId = $('#addChapterSelect').value;
+    if (!deckId || !chapterId) { toast('저장 위치를 선택해줘'); return; }
     const examples = readExampleRowsFrom($('#exampleList'));
     const w = {
       id: uid(),
-      deckId: state.currentDeckId,
+      deckId, chapterId,
       term, meaning,
       examples,
       created: Date.now(),
@@ -1709,8 +2168,8 @@
     state.words.unshift(w);
     save();
     clearAddForm();
+    updateMeta();
     toast(examples.length > 0 ? `추가됨 (예문 ${examples.length}개)` : '추가됨');
-    renderDeckBar();
   }
   $('#btnAdd').addEventListener('click', addWord);
   $('#btnClear').addEventListener('click', clearAddForm);
@@ -1719,91 +2178,26 @@
     if (e.key === 'Enter') { e.preventDefault(); $('#inputMeaning').focus(); }
   });
 
+  $('#addDeckSelect').addEventListener('change', () => {
+    state.currentDeckId = $('#addDeckSelect').value;
+    const deck = state.decks.find(d => d.id === state.currentDeckId);
+    state.currentChapterId = (deck && deck.chapters && deck.chapters[0]) ? deck.chapters[0].id : null;
+    refreshAddChapterOptions();
+    save();
+  });
+  $('#addChapterSelect').addEventListener('change', () => {
+    state.currentChapterId = $('#addChapterSelect').value;
+    save();
+  });
+
   // ===== Meta =====
   function updateMeta() {
     const all = state.words.length;
-    const inCurr = wordsInDeck(state.currentDeckId).length;
-    $('#countList').textContent = inCurr;
+    $('#countList').textContent = all;
     if (all === 0) $('#meta').textContent = '시작해보자';
     else if (state.decks.length === 1) $('#meta').textContent = `${all} palabras`;
     else $('#meta').textContent = `전체 ${all} · ${state.decks.length}개 단어장`;
-
-    const ctx = $('#addContext');
-    const deck = getCurrentDeck();
-    if (deck) ctx.innerHTML = `현재 단어장: <strong>${escapeHtml(deck.name)}</strong>`;
   }
-
-  // ===== List =====
-  function renderList() {
-    const q = $('#search').value.trim().toLowerCase();
-    const list = $('#wordList');
-    const inDeck = wordsInDeck(state.currentDeckId);
-    const filtered = inDeck.filter(w => {
-      if (!q) return true;
-      if (w.term.toLowerCase().includes(q)) return true;
-      if (w.meaning.toLowerCase().includes(q)) return true;
-      return (w.examples || []).some(e =>
-        e.text.toLowerCase().includes(q) || (e.meaning && e.meaning.toLowerCase().includes(q))
-      );
-    });
-
-    if (filtered.length === 0) {
-      const deck = getCurrentDeck();
-      const msg = inDeck.length === 0
-        ? `"${deck ? deck.name : ''}" 단어장이 비어있어`
-        : '검색 결과 없음';
-      list.innerHTML = `<div class="empty"><span class="ornament">· · ·</span>${escapeHtml(msg)}</div>`;
-      return;
-    }
-
-    list.innerHTML = filtered.map(w => {
-      const exs = w.examples || [];
-      const deckLang = getDeckLang(w.deckId);
-      const exsHtml = exs.length > 0 ? `
-        <div class="word-examples">
-          ${exs.map(e => `
-            <div class="word-example">
-              <div class="word-example-text">${escapeHtml(e.text)}<button class="speak-btn-tiny" data-speak="${escapeAttr(e.text)}" data-lang="${escapeAttr(deckLang)}" title="발음">♪</button></div>
-              ${e.meaning ? `<div class="word-example-meaning">${escapeHtml(e.meaning)}</div>` : ''}
-            </div>
-          `).join('')}
-        </div>` : '';
-      return `
-        <li class="word-item" data-id="${w.id}">
-          <div class="word-head">
-            <div>
-              <div class="word-term">${escapeHtml(w.term)}<button class="speak-btn" data-speak="${escapeAttr(w.term)}" data-lang="${escapeAttr(deckLang)}" title="발음">♪</button></div>
-              <div class="word-meaning">${escapeHtml(w.meaning)}</div>
-            </div>
-            <div class="word-actions">
-              <span class="stats">${w.correct || 0} · ${w.wrong || 0}</span>
-              <button data-edit="${w.id}" title="편집">✎</button>
-              <button class="danger" data-del="${w.id}" title="삭제">×</button>
-            </div>
-          </div>
-          ${exsHtml}
-        </li>`;
-    }).join('');
-
-    list.querySelectorAll('[data-del]').forEach(b => {
-      b.addEventListener('click', () => {
-        const id = b.dataset.del;
-        if (confirm('삭제할까?')) {
-          state.words = state.words.filter(w => w.id !== id);
-          save();
-          renderList();
-          renderDeckBar();
-        }
-      });
-    });
-    list.querySelectorAll('[data-edit]').forEach(b => {
-      b.addEventListener('click', () => openEditModal(b.dataset.edit));
-    });
-    list.querySelectorAll('[data-speak]').forEach(b => {
-      b.addEventListener('click', () => speak(b.dataset.speak, b.dataset.lang));
-    });
-  }
-  $('#search').addEventListener('input', renderList);
 
   // ===== Edit modal =====
   function openEditModal(wordId) {
@@ -1873,8 +2267,8 @@
       w.examples = newExamples;
       save();
       overlay.querySelector('#editCancel').click();
-      renderList();
-      renderDeckBar();
+      renderManage();
+      updateMeta();
       toast('저장됨');
     });
   }
@@ -2185,7 +2579,7 @@
   // ===== Export / Import =====
   $('#btnExport').addEventListener('click', () => {
     const data = JSON.stringify({
-      version: 3,
+      version: 4,
       decks: state.decks,
       words: state.words,
       exported: new Date().toISOString()
@@ -2211,28 +2605,52 @@
         const migrated = migrateData(parsed);
         if (!migrated) throw new Error('빈 데이터');
 
-        // Merge: add decks by name, merge words by (deck, term)
+        // Merge: add decks by name, then chapters by name within each deck, then words by (deck, chapter, term)
         const deckIdMap = {};
+        const chapterIdMap = {};
         (migrated.decks || []).forEach(d => {
-          const ex = state.decks.find(x => x.name === d.name);
-          if (ex) deckIdMap[d.id] = ex.id;
-          else {
-            const newDeck = { id: 'd_' + uid(), name: d.name, created: d.created || Date.now() };
-            if (d.lang) newDeck.lang = d.lang;
-            state.decks.push(newDeck);
-            deckIdMap[d.id] = newDeck.id;
+          let existing = state.decks.find(x => x.name === d.name);
+          if (!existing) {
+            existing = {
+              id: 'd_' + uid(),
+              name: d.name,
+              created: d.created || Date.now(),
+              chapters: []
+            };
+            if (d.lang) existing.lang = d.lang;
+            state.decks.push(existing);
+          }
+          deckIdMap[d.id] = existing.id;
+          // Merge chapters
+          if (!existing.chapters) existing.chapters = [];
+          (d.chapters || []).forEach(c => {
+            let exCh = existing.chapters.find(x => x.name === c.name);
+            if (!exCh) {
+              exCh = { id: 'c_' + uid(), name: c.name, created: c.created || Date.now() };
+              existing.chapters.push(exCh);
+            }
+            chapterIdMap[c.id] = exCh.id;
+          });
+          // Ensure at least one chapter
+          if (existing.chapters.length === 0) {
+            existing.chapters.push({ id: defaultChapterIdFor(existing.id), name: '기본', created: Date.now() });
           }
         });
         const existingKeys = new Set(state.words.map(w => `${w.deckId}::${w.term.toLowerCase()}`));
         let added = 0;
         for (const w of (migrated.words || [])) {
           const newDeckId = deckIdMap[w.deckId] || state.currentDeckId;
+          const targetDeck = state.decks.find(d => d.id === newDeckId);
+          if (!targetDeck) continue;
+          const newChapterId = chapterIdMap[w.chapterId] ||
+            (targetDeck.chapters && targetDeck.chapters[0] ? targetDeck.chapters[0].id : null);
           const key = `${newDeckId}::${w.term.toLowerCase()}`;
           if (existingKeys.has(key)) continue;
           existingKeys.add(key);
           const nw = {
             id: uid(),
             deckId: newDeckId,
+            chapterId: newChapterId,
             term: w.term, meaning: w.meaning,
             examples: Array.isArray(w.examples) ? w.examples.map(e => ({
               id: uid(), text: e.text, meaning: e.meaning || ''
@@ -2247,8 +2665,8 @@
           added++;
         }
         save();
-        renderDeckBar();
-        renderList();
+        refreshAddLocation();
+        renderManage();
         updateMeta();
         toast(`${added}개 추가됨`);
       } catch (err) {
@@ -2266,11 +2684,12 @@
       state.decks = [];
       state.words = [];
       state.currentDeckId = null;
+      state.currentChapterId = null;
       studySelectedDecks = new Set();
       ensureValidDeckState();
       save();
-      renderDeckBar();
-      renderList();
+      refreshAddLocation();
+      goToDeckList();
       updateMeta();
       toast('전체 삭제됨');
     }
@@ -2278,9 +2697,9 @@
 
   // ===== Init =====
   load();
-  renderDeckBar();
+  ensureValidDeckState();
+  refreshAddLocation();
   updateMeta();
-  renderList();
 
   $('#btnSignin').addEventListener('click', handleSignin);
   $('#btnSignup').addEventListener('click', handleSignup);
