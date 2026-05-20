@@ -2486,8 +2486,36 @@
     const chapter = (deck.chapters || []).find(c => c.id === manageView.chapterId);
     if (!chapter) { goToChapterList(deck.id); return; }
 
+    // Render the shell once (breadcrumb + search input + results container).
+    // We do NOT replace this on every keystroke — otherwise mobile keyboards
+    // collapse because the input element gets destroyed and recreated.
+    root.innerHTML = `
+      <nav class="manage-breadcrumb">
+        <button class="manage-back" id="btnBackToChapters" type="button">← ${escapeHtml(deck.name)}</button>
+        <span class="manage-current">${escapeHtml(chapter.name)}</span>
+      </nav>
+      <div class="toolbar">
+        <input type="text" id="wordSearch" placeholder="검색..." autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div id="wordListContainer"></div>
+    `;
+
+    root.querySelector('#btnBackToChapters').addEventListener('click', () => goToChapterList(deck.id));
+    root.querySelector('#wordSearch').addEventListener('input', () => {
+      updateWordListResults(chapter);
+    });
+
+    // Initial paint of the list
+    updateWordListResults(chapter);
+  }
+
+  // Update only the results container — preserves the search input element so
+  // mobile keyboards stay open while typing.
+  function updateWordListResults(chapter) {
+    const container = $('#wordListContainer');
+    if (!container) return;
+    const q = ($('#wordSearch')?.value || '').trim().toLowerCase();
     const allWords = state.words.filter(w => w.chapterId === chapter.id);
-    const q = (root.querySelector('#wordSearch')?.value || '').trim().toLowerCase();
     const filtered = q ? allWords.filter(w => {
       if (w.term.toLowerCase().includes(q)) return true;
       if (w.meaning.toLowerCase().includes(q)) return true;
@@ -2496,28 +2524,13 @@
       );
     }) : allWords;
 
-    let listHtml;
     if (filtered.length === 0) {
       const msg = allWords.length === 0 ? '아직 단어가 없어' : '검색 결과 없음';
-      listHtml = `<div class="empty"><span class="ornament">· · ·</span>${escapeHtml(msg)}</div>`;
+      container.innerHTML = `<div class="empty"><span class="ornament">· · ·</span>${escapeHtml(msg)}</div>`;
     } else {
-      listHtml = `<ul class="word-list">${filtered.map(renderWordItem).join('')}</ul>`;
+      container.innerHTML = `<ul class="word-list">${filtered.map(renderWordItem).join('')}</ul>`;
     }
-
-    root.innerHTML = `
-      <nav class="manage-breadcrumb">
-        <button class="manage-back" id="btnBackToChapters" type="button">← ${escapeHtml(deck.name)}</button>
-        <span class="manage-current">${escapeHtml(chapter.name)}</span>
-      </nav>
-      <div class="toolbar">
-        <input type="text" id="wordSearch" placeholder="검색..." autocomplete="off" value="${escapeAttr(q)}">
-      </div>
-      ${listHtml}
-    `;
-
-    root.querySelector('#btnBackToChapters').addEventListener('click', () => goToChapterList(deck.id));
-    root.querySelector('#wordSearch').addEventListener('input', () => renderWordListView(root));
-    wireUpWordActions(root);
+    wireUpWordActions(container);
   }
 
   function renderWordItem(w) {
