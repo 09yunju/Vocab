@@ -2486,9 +2486,17 @@
     const chapter = (deck.chapters || []).find(c => c.id === manageView.chapterId);
     if (!chapter) { goToChapterList(deck.id); return; }
 
-    // Render the shell once (breadcrumb + search input + results container).
-    // We do NOT replace this on every keystroke — otherwise mobile keyboards
-    // collapse because the input element gets destroyed and recreated.
+    // Soft-update path: if shell is already in place for this same chapter,
+    // just refresh the results list. This avoids tearing down the search input
+    // (and the mobile keyboard's focus) on background sync refreshes that fire
+    // while the user is typing.
+    if (root.dataset.chapterId === chapter.id && root.querySelector('#wordSearch')) {
+      updateWordListResults(chapter);
+      return;
+    }
+
+    // Full render (first time, or chapter changed)
+    root.dataset.chapterId = chapter.id;
     root.innerHTML = `
       <nav class="manage-breadcrumb">
         <button class="manage-back" id="btnBackToChapters" type="button">← ${escapeHtml(deck.name)}</button>
@@ -2505,7 +2513,6 @@
       updateWordListResults(chapter);
     });
 
-    // Initial paint of the list
     updateWordListResults(chapter);
   }
 
@@ -3605,14 +3612,24 @@
     if (e.key === 'Enter') { e.preventDefault(); $('#authPassword').focus(); }
   });
 
+  // Skip background sync pulls while user is typing in an input or textarea —
+  // a pull may trigger rerenderAfterSync which can disrupt the input focus
+  // (and dismiss the mobile keyboard).
+  function isUserTyping() {
+    const a = document.activeElement;
+    if (!a) return false;
+    const tag = a.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA';
+  }
+
   window.addEventListener('focus', () => {
-    if (currentUser && hasSessionDeckAccess()) syncPull();
+    if (currentUser && hasSessionDeckAccess() && !isUserTyping()) syncPull();
   });
   window.addEventListener('resize', () => {
     if (studyState && $('#panel-study').classList.contains('active')) adjustFlipHeight();
   });
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && currentUser && hasSessionDeckAccess()) syncPull();
+    if (!document.hidden && currentUser && hasSessionDeckAccess() && !isUserTyping()) syncPull();
   });
   window.addEventListener('online', () => {
     if (currentUser && hasSessionDeckAccess()) { pushShared(); pushProgress(); }
